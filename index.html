@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07090f">
+  <meta name="description" content="Centro de Control Creator IA: crea avatares influencer, guiones y storyboards; organiza y mide tu contenido para TikTok, Facebook Reels y YouTube Shorts.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Centro de Control Creator IA</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5.5v-6.5h-5V22H4a1 1 0 0 1-1-1V10.5Z"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3 1.6 4.9L18.5 9.5l-4.9 1.6L12 16l-1.6-4.9L5.5 9.5l4.9-1.6L12 3Z"/><path d="m19 14 .8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14Z"/><path d="m5 15 .7 1.8 1.8.7-1.8.7L5 20l-.7-1.8L2.5 17.5l1.8-.7L5 15Z"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="16" rx="3"/><path d="M7 4v16M17 4v16M2.5 9h4.5M2.5 15h4.5M17 9h4.5M17 15h4.5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="15" rx="3"/><path d="M2.5 9h19M16 14.5h2.5"/><path d="M6 5V3.5h10V5"/></symbol>
+    <symbol id="i-library" viewBox="0 0 24 24"><path d="M4 4h5v16H4zM11 4h4v16h-4zM17.5 5l3.5 14.5-3.5.8L14 5.8z"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.63 15 1.7 1.7 0 0 0 3.08 14H3v-4h.08A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.63h.01A1.7 1.7 0 0 0 10 3.08V3h4v.08A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.37 9v.01A1.7 1.7 0 0 0 20.92 10H21v4h-.08A1.7 1.7 0 0 0 19.4 15Z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="7.3"/><path d="m16.2 16.2 5 5"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+    <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.4-4 2.9-6 6.5-6s6.1 2 6.5 6M16 5.2a3.4 3.4 0 0 1 0 6.6M17.5 14.5c2.5.5 3.8 2.3 4 5.5"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><rect x="2.5" y="5" width="13" height="14" rx="3"/><path d="m15.5 10 6-3.5v11l-6-3.5V10Z"/></symbol>
+    <symbol id="i-dollar" viewBox="0 0 24 24"><path d="M12 2.5v19M16.5 6.5c-.8-1.2-2.3-2-4.2-2-2.4 0-4.2 1.2-4.2 3.2 0 4.5 9 2.6 9 7.3 0 2.2-1.9 3.5-4.8 3.5-2.2 0-4-.9-5-2.3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12.5 5 5L20 6.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2.5"/><path d="M16 8V5.5A2.5 2.5 0 0 0 13.5 3h-8A2.5 2.5 0 0 0 3 5.5v9A2.5 2.5 0 0 0 5.5 17H8"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M4 3h13l4 4v14H4V3Z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3.5 6h17M9 3h6l1 3H8l1-3ZM6 6l1 16h10l1-16M10 10v8M14 10v8"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m14.5 5.5 4 4M4 20l4.5-1 11-11a2.8 2.8 0 0 0-4-4l-11 11L4 20Z"/></symbol>
+    <symbol id="i-duplicate" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M16 8V5.5A2.5 2.5 0 0 0 13.5 3h-8A2.5 2.5 0 0 0 3 5.5v8A2.5 2.5 0 0 0 5.5 16H8M11.5 11h6M11.5 14.5h6M11.5 18h3"/></symbol>
+    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M4 3h16"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 10.5V17M12 7.2v.1"/></symbol>
+    <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="m2 2 20 20M8.8 8.8A10.7 10.7 0 0 1 21 9.5M3 9.5a15 15 0 0 1 3.2-1.8M6.5 14a9.5 9.5 0 0 1 3.5-1.2M10.5 18.2a2.6 2.6 0 0 1 3 0M19 14.2c-.6-.3-1.2-.5-1.9-.7M15 18.2c-.9-.4-1.9-.4-2.8-.1"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-hash" viewBox="0 0 24 24"><path d="M9 3 7 21M17 3l-2 18M4 8.5h17M3 15.5h17"/></symbol>
+    <symbol id="i-wand" viewBox="0 0 24 24"><path d="m4 20 11-11M14 4l1.2-2L16.5 4l2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2L12 4.3 14 4ZM19.5 12l.7-1.5.8 1.5 1.5.7-1.5.8-.8 1.5-.7-1.5-1.5-.8 1.5-.7Z"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5V3Z"/><path d="M14 3v5h5M8 12h8M8 16h8"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7ZM11 13 22 2"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5Z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M18.5 12a7 7 0 0 0-12-5L4 9M5.5 12a7 7 0 0 0 12 5l2.5-2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14.5v2.5"/></symbol>
+    <symbol id="i-trending" viewBox="0 0 24 24"><path d="m3 17 6-6 4 4 8-8M15 7h6v6"/></symbol>
+    <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></symbol>
+    <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></symbol>
+  </svg>
+
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegación principal">
+      <a class="brand" href="#inicio" data-route="inicio" aria-label="Centro de Control Creator IA">
+        <span class="brand-mark"><svg><use href="#i-sparkles"></use></svg></span>
+        <span class="brand-copy">
+          <strong>CREATOR<span>IA</span></strong>
+          <small>Centro de control</small>
+        </span>
+      </a>
+
+      <div class="workspace-pill">
+        <span class="workspace-avatar" id="workspace-avatar">C</span>
+        <span><small>Espacio de trabajo</small><strong id="sidebar-profile-name">Mi estudio</strong></span>
+        <span class="live-dot" title="Sesión local activa"></span>
+      </div>
+
+      <nav class="side-nav">
+        <p class="nav-label">Principal</p>
+        <a href="#inicio" class="nav-item" data-route="inicio"><svg><use href="#i-home"></use></svg><span>Inicio</span></a>
+        <a href="#generador" class="nav-item" data-route="generador"><svg><use href="#i-sparkles"></use></svg><span>Generador</span><em>IA</em></a>
+        <a href="#avatar" class="nav-item" data-route="avatar"><svg><use href="#i-users"></use></svg><span>Avatar IA</span><em>Nuevo</em></a>
+        <a href="#estudio" class="nav-item" data-route="estudio"><svg><use href="#i-film"></use></svg><span>Estudio de video</span></a>
+        <a href="#calendario" class="nav-item" data-route="calendario"><svg><use href="#i-calendar"></use></svg><span>Calendario</span></a>
+        <a href="#analiticas" class="nav-item" data-route="analiticas"><svg><use href="#i-chart"></use></svg><span>Analíticas</span></a>
+        <a href="#monetizacion" class="nav-item" data-route="monetizacion"><svg><use href="#i-wallet"></use></svg><span>Monetización</span></a>
+        <a href="#biblioteca" class="nav-item" data-route="biblioteca"><svg><use href="#i-library"></use></svg><span>Biblioteca</span></a>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+      <div class="local-note">
+        <span class="local-note-icon"><svg><use href="#i-lock"></use></svg></span>
+        <div><strong>Datos locales</strong><p>Guardado en este dispositivo. Sin conexiones automáticas.</p></div>
+      </div>
+      <button class="profile-button" type="button" data-action="open-settings">
+        <span class="profile-avatar" id="sidebar-avatar">C</span>
+        <span><strong id="sidebar-user-name">Creador</strong><small>Plan local · México</small></span>
+        <svg><use href="#i-settings"></use></svg>
+      </button>
+    </aside>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="mobile-mark"><svg><use href="#i-sparkles"></use></svg></span>
+          <div>
+            <p class="topbar-eyebrow">Creator IA</p>
+            <h1 id="topbar-title">Inicio</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="save-state" id="save-state"><span class="save-dot"></span><span>Guardado local</span></span>
+          <button class="icon-button" type="button" data-action="global-search" aria-label="Buscar en todo el estudio"><svg><use href="#i-search"></use></svg></button>
+          <button class="icon-button" type="button" data-action="open-settings" aria-label="Ajustes y datos"><svg><use href="#i-settings"></use></svg></button>
+          <button class="profile-avatar top-avatar" type="button" data-action="open-settings" aria-label="Abrir perfil" id="topbar-avatar">C</button>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <section class="view is-active" id="view-inicio" data-view="inicio" aria-labelledby="title-inicio">
+          <div class="page-head dashboard-head">
+            <div>
+              <p class="eyebrow">Panel general · <span id="today-label">Hoy</span></p>
+              <h2 id="title-inicio"><span id="greeting">Hola, Creador.</span><br>Tu contenido, bajo control.</h2>
+              <p class="page-sub">Organiza tus canales, crea con intención y registra resultados reales.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-ghost" type="button" data-action="register-metric"><svg><use href="#i-chart"></use></svg>Registrar métricas</button>
+              <button class="btn btn-primary" type="button" data-route="generador"><svg><use href="#i-sparkles"></use></svg>Crear contenido</button>
+            </div>
+          </div>
+
+          <div id="sample-banner" class="callout callout-demo" hidden>
+            <div class="callout-icon"><svg><use href="#i-info"></use></svg></div>
+            <div><strong>Estás viendo datos de demostración</strong><p>Son ficticios y están marcados como ejemplo. No representan tus resultados reales.</p></div>
+            <button class="btn btn-small btn-ghost" type="button" data-action="clear-sample">Quitar datos demo</button>
+          </div>
+
+          <div class="hero-card">
+            <div class="hero-copy">
+              <span class="hero-badge"><span></span> Estudio creativo · México</span>
+              <h3>Ideas claras. Métricas honestas.<br>Crecimiento con intención.</h3>
+              <p>Un solo lugar para tus guiones, storyboards, calendario y números de TikTok, Facebook Reels y YouTube Shorts.</p>
+              <div class="hero-actions">
+                <button class="btn btn-primary" type="button" data-route="generador"><svg><use href="#i-wand"></use></svg>Generar un guion</button>
+                <button class="btn btn-hero-ghost" type="button" data-action="open-calendar-new"><svg><use href="#i-calendar"></use></svg>Planear publicación</button>
+              </div>
+            </div>
+            <div class="hero-visual" aria-hidden="true">
+              <div class="orbit orbit-one"></div>
+              <div class="orbit orbit-two"></div>
+              <div class="hero-core">
+                <span class="core-mark"><svg><use href="#i-sparkles"></use></svg></span>
+                <strong>CREATOR<br>OS</strong>
+                <small>local · v1.0</small>
+              </div>
+              <div class="float-chip chip-tiktok"><span class="platform-dot tiktok"></span>TikTok</div>
+              <div class="float-chip chip-reels"><span class="platform-dot facebook"></span>Reels</div>
+              <div class="float-chip chip-shorts"><span class="platform-dot youtube"></span>Shorts</div>
+              <div class="hero-glow"></div>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="dashboard-kpis"></div>
+
+          <div class="dashboard-grid">
+            <article class="panel chart-panel">
+              <div class="panel-head">
+                <div><p class="eyebrow">Últimos 7 días</p><h3>Vistas registradas</h3></div>
+                <span class="data-chip"><span></span>Manual</span>
+              </div>
+              <div id="weekly-chart" class="chart-area chart-area-sm"></div>
+              <div class="panel-foot">
+                <span id="weekly-caption">Sin registros en los últimos 7 días.</span>
+                <button class="text-link" type="button" data-route="analiticas">Ver analíticas <svg><use href="#i-arrow-right"></use></svg></button>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <div><p class="eyebrow">Calendario</p><h3>Próximas publicaciones</h3></div>
+                <button class="icon-button small" type="button" data-route="calendario" aria-label="Abrir calendario"><svg><use href="#i-arrow-up-right"></use></svg></button>
+              </div>
+              <div id="upcoming-list" class="compact-list"></div>
+              <button class="panel-add" type="button" data-action="open-calendar-new"><svg><use href="#i-plus"></use></svg>Agregar publicación</button>
+            </article>
+          </div>
+
+          <div class="dashboard-grid dashboard-lower">
+            <article class="panel">
+              <div class="panel-head">
+                <div><p class="eyebrow">Monetización</p><h3>Ingresos del mes</h3></div>
+                <span class="data-chip"><span></span>Manual</span>
+              </div>
+              <div id="dashboard-revenue"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <div><p class="eyebrow">Canales</p><h3>Tus plataformas</h3></div>
+                <span class="status-pill neutral">Sin integrar</span>
+              </div>
+              <div id="channel-overview" class="channel-list"></div>
+              <p class="fine-print"><svg><use href="#i-info"></use></svg>Las cifras se cargan manualmente. Esta versión no sincroniza APIs.</p>
+            </article>
+
+            <article class="panel setup-panel" id="setup-card">
+              <div class="panel-head">
+                <div><p class="eyebrow">Primeros pasos</p><h3>Pon tu estudio en marcha</h3></div>
+                <span class="progress-label" id="setup-progress-label">0/4</span>
+              </div>
+              <div class="progress-track"><span id="setup-progress-bar"></span></div>
+              <div id="setup-list" class="setup-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="view-generador" data-view="generador" aria-labelledby="title-generador">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Motor creativo local</p>
+              <h2 id="title-generador">Generador de contenido</h2>
+              <p class="page-sub">Convierte una idea en guion, ganchos, escenas, títulos, descripción y hashtags.</p>
+            </div>
+            <span class="engine-badge"><span class="pulse-dot"></span>IA local · sin API externa</span>
+          </div>
+
+          <div class="generator-layout">
+            <form class="panel form-panel sticky-panel" id="generator-form" novalidate>
+              <div class="panel-head">
+                <div><p class="eyebrow">Brief creativo</p><h3>¿Qué vamos a crear?</h3></div>
+                <span class="step-pill">01</span>
+              </div>
+
+              <fieldset class="field-group">
+                <legend>Plataforma</legend>
+                <div class="platform-picker" role="radiogroup" aria-label="Plataforma">
+                  <label class="platform-choice">
+                    <input type="radio" name="gen-platform" value="TikTok" checked>
+                    <span><span class="platform-dot tiktok"></span><b>TikTok</b><small>Vertical · 9:16</small></span>
+                  </label>
+                  <label class="platform-choice">
+                    <input type="radio" name="gen-platform" value="Facebook Reels">
+                    <span><span class="platform-dot facebook"></span><b>Reels</b><small>Facebook · 9:16</small></span>
+                  </label>
+                  <label class="platform-choice">
+                    <input type="radio" name="gen-platform" value="YouTube Shorts">
+                    <span><span class="platform-dot youtube"></span><b>Shorts</b><small>YouTube · 9:16</small></span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div class="form-row">
+                <label class="field">
+                  <span>Nicho</span>
+                  <select id="gen-niche" required>
+                    <option>Finanzas personales</option>
+                    <option>Tecnología</option>
+                    <option>Cocina</option>
+                    <option>Fitness</option>
+                    <option>Belleza</option>
+                    <option>Emprendimiento</option>
+                    <option>Educación</option>
+                    <option>Humor</option>
+                    <option>Viajes</option>
+                    <option>Hogar</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Objetivo</span>
+                  <select id="gen-objective">
+                    <option>Más vistas</option>
+                    <option>Más seguidores</option>
+                    <option>Más comentarios</option>
+                    <option>Vender un producto</option>
+                    <option>Educar a la audiencia</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Tema del video <em id="gen-topic-count">0/140</em></span>
+                <textarea id="gen-topic" rows="3" maxlength="140" placeholder="Ej. Cómo organizar tus finanzas con $500 pesos a la semana" required></textarea>
+                <small class="field-hint">Sé específico: un problema, una promesa o una historia.</small>
+              </label>
+
+              <fieldset class="field-group">
+                <legend>Duración</legend>
+                <div class="segmented" id="gen-duration" role="radiogroup" aria-label="Duración del video">
+                  <label><input type="radio" name="gen-duration" value="15" checked><span>15 s</span></label>
+                  <label><input type="radio" name="gen-duration" value="30"><span>30 s</span></label>
+                  <label><input type="radio" name="gen-duration" value="45"><span>45 s</span></label>
+                  <label><input type="radio" name="gen-duration" value="60"><span>60 s</span></label>
+                  <label><input type="radio" name="gen-duration" value="90"><span>90 s</span></label>
+                </div>
+              </fieldset>
+
+              <div class="form-row">
+                <label class="field">
+                  <span>Tono</span>
+                  <select id="gen-tone">
+                    <option>Directo y cercano</option>
+                    <option>Educativo</option>
+                    <option>Entretenido</option>
+                    <option>Inspirador</option>
+                    <option>Polémico y responsable</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Público</span>
+                  <select id="gen-audience">
+                    <option>Adultos en México</option>
+                    <option>Jóvenes 18–24</option>
+                    <option>Padres y familias</option>
+                    <option>Emprendedores</option>
+                    <option>Principiantes</option>
+                  </select>
+                </label>
+              </div>
+
+              <button class="btn btn-primary btn-block btn-generate" type="submit"><svg><use href="#i-sparkles"></use></svg>Generar contenido</button>
+              <p class="fine-print centered"><svg><use href="#i-info"></use></svg>Generación por plantillas inteligentes locales. Revisa siempre antes de publicar.</p>
+            </form>
+
+            <div class="panel output-panel" id="generator-output-panel">
+              <div class="output-toolbar">
+                <div><p class="eyebrow">Resultado</p><h3 id="generator-result-title">Tu contenido aparecerá aquí</h3></div>
+                <div class="output-actions" id="generator-actions" hidden>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="copy-generator"><svg><use href="#i-copy"></use></svg>Copiar</button>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="schedule-generator"><svg><use href="#i-calendar"></use></svg>Programar</button>
+                  <button class="btn btn-small btn-dark" type="button" data-action="save-generator"><svg><use href="#i-save"></use></svg>Guardar</button>
+                </div>
+              </div>
+              <div id="generator-output" class="output-body">
+                <div class="empty-state tall">
+                  <div class="empty-visual generator-visual">
+                    <span class="empty-orbit"></span>
+                    <span class="empty-icon"><svg><use href="#i-sparkles"></use></svg></span>
+                    <span class="mini-prompt">idea + contexto</span>
+                    <span class="mini-arrow"><svg><use href="#i-arrow-right"></use></svg></span>
+                    <span class="mini-prompt accent">contenido listo</span>
+                  </div>
+                  <h3>Empieza con un tema</h3>
+                  <p>Completa el brief y genera un guion estructurado para tu próxima publicación.</p>
+                  <div class="empty-tips">
+                    <span><svg><use href="#i-check"></use></svg>Ganchos</span>
+                    <span><svg><use href="#i-check"></use></svg>Escenas</span>
+                    <span><svg><use href="#i-check"></use></svg>Hashtags</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-avatar" data-view="avatar" aria-labelledby="title-avatar">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Influencer IA · TikTok Shop</p>
+              <h2 id="title-avatar">Tu avatar de ventas, listo para cámara</h2>
+              <p class="page-sub">Diseña una persona sintética fotorrealista para presentar productos, ganar confianza y probar ángulos de venta sin organizar una sesión de fotos.</p>
+            </div>
+            <div class="page-actions">
+              <span class="engine-badge"><span class="pulse-dot"></span>Imagen IA · Flux Dev</span>
+            </div>
+          </div>
+
+          <div class="avatar-layout">
+            <form class="panel form-panel" id="avatar-form" novalidate>
+              <div class="panel-head">
+                <div><p class="eyebrow">Brief del personaje</p><h3>¿Quién vende por ti?</h3></div>
+                <span class="step-pill">01</span>
+              </div>
+
+              <div class="form-row">
+                <label class="field">
+                  <span>Nombre del avatar</span>
+                  <input id="avatar-name" type="text" maxlength="28" placeholder="Ej. Valentina" required>
+                </label>
+                <label class="field">
+                  <span>Edad aparente</span>
+                  <input id="avatar-age" type="number" min="20" max="55" value="28" required>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Producto estrella</span>
+                <input id="avatar-product" type="text" maxlength="60" placeholder="Ej. sérum de vitamina C" required>
+                <small class="field-hint">Se usará en el kit de ventas y en el contexto de la imagen.</small>
+              </label>
+
+              <div class="form-row">
+                <label class="field">
+                  <span>Nicho</span>
+                  <select id="avatar-niche">
+                    <option>Belleza y skincare</option>
+                    <option>Fitness y bienestar</option>
+                    <option>Moda y accesorios</option>
+                    <option>Hogar y organización</option>
+                    <option>Tecnología y gadgets</option>
+                    <option>Cocina y alimentos</option>
+                    <option>Finanzas personales</option>
+                    <option>Emprendimiento</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Presentación</span>
+                  <select id="avatar-presentation">
+                    <option>Mujer</option>
+                    <option>Hombre</option>
+                    <option>Persona no binaria</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label class="field">
+                  <span>Apariencia</span>
+                  <select id="avatar-look">
+                    <option>Latina mexicana</option>
+                    <option>Mestiza</option>
+                    <option>Afrodescendiente</option>
+                    <option>Asiática</option>
+                    <option>Europea</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Personalidad</span>
+                  <select id="avatar-personality">
+                    <option>Cercana y cálida</option>
+                    <option>Segura y directa</option>
+                    <option>Divertida y espontánea</option>
+                    <option>Premium y elegante</option>
+                    <option>Experta y tranquila</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Escenario</span>
+                <select id="avatar-setting">
+                  <option>Cocina luminosa</option>
+                  <option>Estudio limpio</option>
+                  <option>Oficina moderna</option>
+                  <option>Sala acogedora</option>
+                  <option>Exterior urbano</option>
+                  <option>Fondo neutro</option>
+                </select>
+              </label>
+
+              <div class="form-row">
+                <label class="field">
+                  <span>Vestuario</span>
+                  <select id="avatar-outfit">
+                    <option>Casual premium</option>
+                    <option>Blazer editorial</option>
+                    <option>Deportivo</option>
+                    <option>Delantal de cocina</option>
+                    <option>Camisa de lino</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Formato</span>
+                  <select id="avatar-format">
+                    <option value="9:16">Vertical 9:16</option>
+                    <option value="4:5">Feed 4:5</option>
+                    <option value="1:1">Perfil 1:1</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Detalles extra <em>opcional</em></span>
+                <textarea id="avatar-notes" rows="2" maxlength="120" placeholder="Ej. pecas suaves, cabello ondulado, sonrisa natural"></textarea>
+              </label>
+
+              <button class="btn btn-primary btn-block btn-generate" id="avatar-submit" type="submit"><svg><use href="#i-sparkles"></use></svg>Generar avatar con IA</button>
+              <p class="fine-print centered" id="avatar-engine-note"><svg><use href="#i-info"></use></svg>Generación gratuita con Flux Dev en un servicio externo. Si está ocupado, se usará un respaldo automático.</p>
+              <p class="fine-print centered" id="avatar-cooldown" hidden></p>
+            </form>
+
+            <div class="panel avatar-output-panel">
+              <div class="output-toolbar">
+                <div><p class="eyebrow">Resultado</p><h3 id="avatar-result-title">Tu influencer aparecerá aquí</h3></div>
+                <div class="output-actions" id="avatar-actions" hidden>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="variate-avatar"><svg><use href="#i-refresh"></use></svg>Otra versión</button>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="copy-avatar-kit"><svg><use href="#i-copy"></use></svg>Copiar kit</button>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="download-avatar"><svg><use href="#i-download"></use></svg>Descargar</button>
+                  <button class="btn btn-small btn-dark" type="button" data-action="save-avatar-library"><svg><use href="#i-save"></use></svg>Guardar</button>
+                </div>
+              </div>
+              <div class="avatar-output-body" id="avatar-output">
+                <div class="empty-state tall avatar-empty">
+                  <div class="avatar-empty-visual" aria-hidden="true">
+                    <div class="avatar-empty-photo"><span class="avatar-empty-scan"></span><span class="avatar-empty-badge">IA</span></div>
+                    <div class="avatar-empty-card card-a"><span></span><span></span><span></span></div>
+                    <div class="avatar-empty-card card-b"><strong>9:16</strong><small>vertical</small></div>
+                  </div>
+                  <h3>Un rostro nuevo, sin sesión de fotos</h3>
+                  <p>Completa el brief y genera un retrato fotorrealista con un kit de ventas listo para adaptar a tus videos.</p>
+                  <div class="empty-tips">
+                    <span><svg><use href="#i-check"></use></svg>Retrato 9:16</span>
+                    <span><svg><use href="#i-check"></use></svg>Bio y ganchos</span>
+                    <span><svg><use href="#i-check"></use></svg>Guardado local</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel avatar-history-panel">
+            <div class="panel-head">
+              <div><p class="eyebrow">Tus personas sintéticas</p><h3>Avatares recientes</h3></div>
+              <span class="step-pill" id="avatar-history-count">0/8</span>
+            </div>
+            <div class="avatar-history" id="avatar-history"></div>
+          </div>
+        </section>
+
+        <section class="view" id="view-estudio" data-view="estudio" aria-labelledby="title-estudio">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Preproducción visual</p>
+              <h2 id="title-estudio">Estudio de videos IA</h2>
+              <p class="page-sub">Diseña storyboards, fotogramas iniciales y finales, y prompts de animación coherentes.</p>
+            </div>
+            <span class="engine-badge"><span class="pulse-dot"></span>Storyboard local</span>
+          </div>
+
+          <div class="studio-layout">
+            <form class="panel form-panel" id="studio-form" novalidate>
+              <div class="panel-head">
+                <div><p class="eyebrow">Configuración</p><h3>Dirección del video</h3></div>
+                <span class="step-pill">02</span>
+              </div>
+
+              <label class="field">
+                <span>Concepto del video</span>
+                <textarea id="studio-topic" rows="3" maxlength="180" placeholder="Ej. Rutina de 60 segundos para editar un Short desde el celular" required></textarea>
+              </label>
+
+              <div class="form-row">
+                <label class="field">
+                  <span>Plataforma</span>
+                  <select id="studio-platform">
+                    <option>TikTok</option>
+                    <option>Facebook Reels</option>
+                    <option>YouTube Shorts</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Duración</span>
+                  <select id="studio-duration">
+                    <option value="15">15 segundos</option>
+                    <option value="30" selected>30 segundos</option>
+                    <option value="45">45 segundos</option>
+                    <option value="60">60 segundos</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label class="field">
+                  <span>Estilo visual</span>
+                  <select id="studio-style">
+                    <option>Cinemático</option>
+                    <option>Minimalista</option>
+                    <option>Documental</option>
+                    <option>Neón / futurista</option>
+                    <option>Analógico / vintage</option>
+                    <option>3D limpio</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Formato narrativo</span>
+                  <select id="studio-format">
+                    <option>Tutorial paso a paso</option>
+                    <option>Historia personal</option>
+                    <option>Antes y después</option>
+                    <option>Demostración de producto</option>
+                    <option>Lista rápida</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Dirección de arte</span>
+                <input id="studio-art" type="text" maxlength="90" value="Fondo oscuro, luz suave, acento verde lima">
+                <small class="field-hint">Ej. paleta, locación, vestuario o energía.</small>
+              </label>
+
+              <button class="btn btn-primary btn-block btn-generate" type="submit"><svg><use href="#i-film"></use></svg>Crear storyboard</button>
+              <p class="fine-print centered"><svg><use href="#i-info"></use></svg>Los prompts son borradores para tu herramienta de video preferida.</p>
+            </form>
+
+            <div class="panel output-panel studio-output-panel">
+              <div class="output-toolbar">
+                <div><p class="eyebrow">Storyboard</p><h3 id="studio-result-title">Tu tablero visual</h3></div>
+                <div class="output-actions" id="studio-actions" hidden>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="copy-storyboard"><svg><use href="#i-copy"></use></svg>Copiar prompt</button>
+                  <button class="btn btn-small btn-dark" type="button" data-action="save-storyboard"><svg><use href="#i-save"></use></svg>Guardar prompts</button>
+                </div>
+              </div>
+              <div id="studio-output" class="output-body">
+                <div class="empty-state tall">
+                  <div class="empty-visual studio-visual">
+                    <span class="frame-card frame-a"></span>
+                    <span class="frame-card frame-b"></span>
+                    <span class="frame-card frame-c"></span>
+                    <span class="play-badge"><svg><use href="#i-play"></use></svg></span>
+                  </div>
+                  <h3>Del concepto al fotograma</h3>
+                  <p>Describe tu idea y obtén escenas con encuadre, acción, transición y prompts de animación.</p>
+                  <div class="empty-tips">
+                    <span><svg><use href="#i-check"></use></svg>Inicio y final</span>
+                    <span><svg><use href="#i-check"></use></svg>Movimiento de cámara</span>
+                    <span><svg><use href="#i-check"></use></svg>Prompts listos</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-calendario" data-view="calendario" aria-labelledby="title-calendario">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Planificación editorial</p>
+              <h2 id="title-calendario">Calendario de publicaciones</h2>
+              <p class="page-sub">Organiza ideas, grabaciones y estrenos en un solo flujo de trabajo.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-ghost" type="button" data-action="calendar-today">Hoy</button>
+              <button class="btn btn-primary" type="button" data-action="open-calendar-new"><svg><use href="#i-plus"></use></svg>Nueva publicación</button>
+            </div>
+          </div>
+
+          <div class="panel calendar-panel">
+            <div class="calendar-toolbar">
+              <div class="calendar-month-nav">
+                <button class="icon-button" type="button" data-action="prev-month" aria-label="Mes anterior"><svg><use href="#i-chevron-left"></use></svg></button>
+                <h3 id="calendar-month-label">Octubre 2026</h3>
+                <button class="icon-button" type="button" data-action="next-month" aria-label="Mes siguiente"><svg><use href="#i-chevron-right"></use></svg></button>
+              </div>
+              <div class="calendar-filters">
+                <label class="select-compact"><svg><use href="#i-filter"></use></svg><select id="calendar-platform-filter" aria-label="Filtrar por plataforma"><option value="all">Todas las plataformas</option><option>TikTok</option><option>Facebook Reels</option><option>YouTube Shorts</option></select></label>
+                <label class="select-compact"><select id="calendar-status-filter" aria-label="Filtrar por estado"><option value="all">Todos los estados</option><option>Idea</option><option>Guion</option><option>Grabación</option><option>Edición</option><option>Programado</option><option>Publicado</option></select></label>
+              </div>
+            </div>
+            <div class="calendar-weekdays" aria-hidden="true"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+            <div class="calendar-legend">
+              <span><i class="legend-dot tiktok"></i>TikTok</span>
+              <span><i class="legend-dot facebook"></i>Facebook Reels</span>
+              <span><i class="legend-dot youtube"></i>YouTube Shorts</span>
+              <span class="legend-hint"><svg><use href="#i-info"></use></svg>Toca un día para ver su agenda</span>
+            </div>
+          </div>
+
+          <div class="calendar-bottom-grid">
+            <article class="panel">
+              <div class="panel-head"><div><p class="eyebrow">Enfoque</p><h3>Esta semana</h3></div><span class="data-chip"><span></span><span id="week-count">0 publicaciones</span></span></div>
+              <div id="week-agenda" class="agenda-list"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><div><p class="eyebrow">Flujo</p><h3>Estado del pipeline</h3></div></div>
+              <div id="pipeline-stats" class="pipeline-stats"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="view-analiticas" data-view="analiticas" aria-labelledby="title-analiticas">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Datos que tú registras</p>
+              <h2 id="title-analiticas">Analíticas</h2>
+              <p class="page-sub">Compara plataformas y entiende qué contenido funciona. Sin cifras inventadas.</p>
+            </div>
+            <button class="btn btn-primary" type="button" data-action="register-metric"><svg><use href="#i-plus"></use></svg>Registrar métricas</button>
+          </div>
+
+          <div class="toolbar-card">
+            <div class="segmented segmented-dark" id="analytics-range" role="radiogroup" aria-label="Periodo">
+              <label><input type="radio" name="analytics-range" value="7"><span>7 días</span></label>
+              <label><input type="radio" name="analytics-range" value="30" checked><span>30 días</span></label>
+              <label><input type="radio" name="analytics-range" value="90"><span>90 días</span></label>
+            </div>
+            <div class="toolbar-right">
+              <label class="select-compact"><svg><use href="#i-filter"></use></svg><select id="analytics-platform-filter" aria-label="Filtrar por plataforma"><option value="all">Todas las plataformas</option><option>TikTok</option><option>Facebook Reels</option><option>YouTube Shorts</option></select></label>
+              <span class="data-chip"><span></span>Origen manual</span>
+            </div>
+          </div>
+
+          <div class="kpi-grid kpi-grid-analytics" id="analytics-kpis"></div>
+
+          <div class="analytics-grid">
+            <article class="panel chart-panel span-2">
+              <div class="panel-head">
+                <div><p class="eyebrow">Comparativa</p><h3>Vistas por plataforma</h3></div>
+                <span class="chart-note" id="analytics-range-label">Últimos 30 días</span>
+              </div>
+              <div id="views-chart" class="chart-area"></div>
+            </article>
+            <article class="panel chart-panel">
+              <div class="panel-head">
+                <div><p class="eyebrow">Interacción</p><h3>Comentarios, compartidos y clics</h3></div>
+              </div>
+              <div id="engagement-chart" class="chart-area"></div>
+            </article>
+            <article class="panel chart-panel">
+              <div class="panel-head">
+                <div><p class="eyebrow">Comunidad</p><h3>Seguidores ganados</h3></div>
+                <span class="chart-note">Neto manual</span>
+              </div>
+              <div id="followers-chart" class="chart-area"></div>
+            </article>
+            <article class="panel chart-panel">
+              <div class="panel-head">
+                <div><p class="eyebrow">Ingresos</p><h3>Ingresos registrados</h3></div>
+              </div>
+              <div id="analytics-revenue-chart" class="chart-area"></div>
+            </article>
+          </div>
+
+          <article class="panel data-table-panel">
+            <div class="panel-head">
+              <div><p class="eyebrow">Bitácora</p><h3>Registros de métricas</h3></div>
+              <span class="record-count" id="metrics-count">0 registros</span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Fecha</th><th>Plataforma</th><th>Publicación</th><th class="num">Vistas</th><th class="num">Retención</th><th class="num">Interacciones</th><th></th></tr></thead>
+                <tbody id="metrics-table-body"></tbody>
+              </table>
+            </div>
+            <div id="metrics-empty" class="table-empty" hidden></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-monetizacion" data-view="monetizacion" aria-labelledby="title-monetizacion">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Ingresos del creador</p>
+              <h2 id="title-monetizacion">Monetización</h2>
+              <p class="page-sub">Anuncios, afiliados, comisiones, patrocinios y productos digitales en una sola vista.</p>
+            </div>
+            <button class="btn btn-primary" type="button" data-action="add-income"><svg><use href="#i-plus"></use></svg>Registrar ingreso</button>
+          </div>
+
+          <div class="toolbar-card">
+            <div class="segmented segmented-dark" id="income-range" role="radiogroup" aria-label="Periodo de ingresos">
+              <label><input type="radio" name="income-range" value="30" checked><span>30 días</span></label>
+              <label><input type="radio" name="income-range" value="90"><span>90 días</span></label>
+              <label><input type="radio" name="income-range" value="365"><span>12 meses</span></label>
+              <label><input type="radio" name="income-range" value="all"><span>Todo</span></label>
+            </div>
+            <div class="toolbar-right">
+              <span class="data-chip"><span></span>Solo registros manuales</span>
+              <button class="text-link" type="button" data-action="income-help">¿Cómo se calcula?</button>
+            </div>
+          </div>
+
+          <div class="kpi-grid kpi-grid-analytics" id="monetization-kpis"></div>
+
+          <div class="monetization-grid">
+            <article class="panel">
+              <div class="panel-head"><div><p class="eyebrow">Distribución</p><h3>Ingresos por fuente</h3></div><span class="chart-note" id="income-period-label">Últimos 30 días</span></div>
+              <div class="income-source-layout">
+                <div id="income-donut" class="donut-wrap"></div>
+                <div id="income-source-bars" class="source-bars"></div>
+              </div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><div><p class="eyebrow">Conexiones</p><h3>Integraciones</h3></div><span class="status-pill neutral">No disponibles</span></div>
+              <p class="integration-copy">Esta primera versión no recibe pagos ni consulta APIs automáticamente. Registra cada ingreso a mano para mantener tus números honestos.</p>
+              <div id="integration-list" class="integration-list"></div>
+              <button class="btn btn-ghost btn-block" type="button" data-action="income-help"><svg><use href="#i-info"></use></svg>Entender las limitaciones</button>
+            </article>
+          </div>
+
+          <article class="panel data-table-panel">
+            <div class="panel-head">
+              <div><p class="eyebrow">Detalle</p><h3>Ingresos registrados</h3></div>
+              <span class="record-count" id="income-count">0 registros</span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Fecha</th><th>Fuente</th><th>Concepto</th><th>Plataforma</th><th>Estado</th><th class="num">Monto</th><th></th></tr></thead>
+                <tbody id="income-table-body"></tbody>
+              </table>
+            </div>
+            <div id="income-empty" class="table-empty" hidden></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-biblioteca" data-view="biblioteca" aria-labelledby="title-biblioteca">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Tu activo creativo</p>
+              <h2 id="title-biblioteca">Biblioteca</h2>
+              <p class="page-sub">Ideas, guiones, prompts, publicaciones y avatares organizados, buscables y reutilizables.</p>
+            </div>
+            <button class="btn btn-primary" type="button" data-action="new-library"><svg><use href="#i-plus"></use></svg>Nuevo elemento</button>
+          </div>
+
+          <div class="library-stats" id="library-stats"></div>
+
+          <div class="library-toolbar">
+            <div class="library-tabs" id="library-tabs" role="tablist">
+              <button class="is-active" type="button" data-library-type="all" role="tab">Todo</button>
+              <button type="button" data-library-type="idea" role="tab">Ideas</button>
+              <button type="button" data-library-type="guion" role="tab">Guiones</button>
+              <button type="button" data-library-type="prompt" role="tab">Prompts</button>
+              <button type="button" data-library-type="publicacion" role="tab">Publicaciones</button>
+              <button type="button" data-library-type="avatar" role="tab">Avatares</button>
+            </div>
+            <div class="library-filters">
+              <label class="search-field"><svg><use href="#i-search"></use></svg><input id="library-search" type="search" placeholder="Buscar por título, texto o etiqueta"></label>
+              <label class="select-compact"><svg><use href="#i-filter"></use></svg><select id="library-platform-filter" aria-label="Filtrar por plataforma"><option value="all">Todas</option><option>TikTok</option><option>Facebook Reels</option><option>YouTube Shorts</option><option>General</option></select></label>
+              <label class="select-compact"><select id="library-sort" aria-label="Ordenar"><option value="recent">Más recientes</option><option value="oldest">Más antiguos</option><option value="title">Título A–Z</option></select></label>
+            </div>
+          </div>
+
+          <div id="library-grid" class="library-grid"></div>
+          <div id="library-empty" class="panel empty-state" hidden></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Navegación móvil">
+    <a href="#inicio" class="bottom-item is-active" data-route="inicio"><svg><use href="#i-home"></use></svg><span>Inicio</span></a>
+    <a href="#generador" class="bottom-item" data-route="generador"><svg><use href="#i-sparkles"></use></svg><span>Crear</span></a>
+    <a href="#calendario" class="bottom-item" data-route="calendario"><svg><use href="#i-calendar"></use></svg><span>Agenda</span></a>
+    <a href="#analiticas" class="bottom-item" data-route="analiticas"><svg><use href="#i-chart"></use></svg><span>Datos</span></a>
+    <button class="bottom-item" type="button" data-action="open-more"><svg><use href="#i-more"></use></svg><span>Más</span></button>
+  </nav>
+
+  <div class="sheet-backdrop" id="more-backdrop" hidden></div>
+  <div class="more-sheet" id="more-sheet" hidden aria-label="Más secciones">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>Más herramientas</h3><button class="icon-button" type="button" data-action="close-more" aria-label="Cerrar"><svg><use href="#i-x"></use></svg></button></div>
+    <div class="more-grid">
+      <a href="#avatar" data-route="avatar"><span class="more-icon violet"><svg><use href="#i-users"></use></svg></span><strong>Avatar IA</strong><small>Influencer para vender</small></a>
+      <a href="#estudio" data-route="estudio"><span class="more-icon violet"><svg><use href="#i-film"></use></svg></span><strong>Estudio de video</strong><small>Storyboards y prompts</small></a>
+      <a href="#monetizacion" data-route="monetizacion"><span class="more-icon lime"><svg><use href="#i-wallet"></use></svg></span><strong>Monetización</strong><small>Ingresos por fuente</small></a>
+      <a href="#biblioteca" data-route="biblioteca"><span class="more-icon cyan"><svg><use href="#i-library"></use></svg></span><strong>Biblioteca</strong><small>Ideas y guiones</small></a>
+      <button type="button" data-action="global-search"><span class="more-icon pink"><svg><use href="#i-search"></use></svg></span><strong>Buscar</strong><small>En todo el estudio</small></button>
+      <button type="button" data-action="open-settings"><span class="more-icon gray"><svg><use href="#i-settings"></use></svg></span><strong>Ajustes</strong><small>Datos y respaldo</small></button>
+    </div>
+    <div class="sheet-foot"><svg><use href="#i-lock"></use></svg>Datos guardados solo en este navegador</div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head">
+        <div><p class="eyebrow" id="modal-eyebrow">Creator IA</p><h2 id="modal-title">Título</h2></div>
+        <button class="icon-button" type="button" data-action="close-modal" aria-label="Cerrar"><svg><use href="#i-x"></use></svg></button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-foot" id="modal-foot"></div>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="js/core.js" defer></script>
+  <script src="js/generator.js" defer></script>
+  <script src="js/avatar.js" defer></script>
+  <script src="js/views.js" defer></script>
+  <script src="js/data-views.js" defer></script>
+  <script src="js/sample.js" defer></script>
+  <script src="js/modals.js" defer></script>
+  <script src="js/actions.js" defer></script>
+</body>
+</html>
