@@ -1,4 +1,17 @@
-# PlayGround
+# Neon Serpent
+
+Juego de la viborita con estética arcade neón. Incluye combos, niveles de velocidad, orbes dorados, récord persistente, sonido procedural, pausa y controles táctiles.
+
+## Cómo jugar
+
+- Flechas o `WASD` para moverte.
+- `Espacio` o `Esc` para pausar.
+- En móvil, desliza sobre el tablero o usa la cruceta inferior.
+- Cada 5 orbes subes de nivel. Los orbes dorados valen el triple y los combos multiplican la puntuación.
+
+La app es estática y autocontenida: abre `index.html` o ejecuta el servidor local con `./start.sh`.
+
+## Proyecto OMGithub
 
 <!-- omgithub:readme:start -->
 ## 🚀 Build, play, and remix with OMGithub

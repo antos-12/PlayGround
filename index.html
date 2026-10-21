@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070b0d">
+  <meta name="description" content="Neon Serpent: una viborita arcade con estética neón, combos, récords y controles táctiles.">
+  <title>Neon Serpent — Viborita Arcade</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/chakra-petch-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <div class="ambient-orb ambient-orb-lime"></div>
+    <div class="ambient-orb ambient-orb-cyan"></div>
+    <div class="ambient-grid"></div>
+    <div class="ambient-noise"></div>
+  </div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Neon Serpent, inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 54 54" fill="none">
+            <path d="M14 37c0-9 25-7 25-16 0-6-8-7-13-3-4 4-3 10 3 12 8 3 15-2 15-9" stroke="currentColor" stroke-width="6.5" stroke-linecap="round"/>
+            <circle cx="38.5" cy="17.5" r="2.1" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <span class="brand-title">NEON <b>SERPENT</b></span>
+          <span class="brand-sub">ARCADE EXPERIENCE <i>//</i> 01</span>
+        </span>
+      </a>
+
+      <div class="topbar-actions">
+        <div class="live-chip"><span class="live-dot"></span><span>SISTEMA ONLINE</span></div>
+        <button class="icon-button" id="soundButton" type="button" aria-label="Silenciar sonido" aria-pressed="true" title="Silenciar sonido">
+          <svg class="icon-sound-on" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/>
+            <path d="M16 8.4a5 5 0 0 1 0 7.2M18.5 5.8a8.5 8.5 0 0 1 0 12.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <svg class="icon-sound-off" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/>
+            <path d="m17 9 5 5m0-5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <section class="arena-card" aria-labelledby="arenaTitle">
+        <div class="arena-head">
+          <div class="arena-heading">
+            <div class="statusline">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="statusLabel">LISTO PARA JUGAR</span>
+            </div>
+            <h2 id="arenaTitle">TABLERO <span>//</span> 01</h2>
+          </div>
+          <div class="arena-stats">
+            <div class="mini-stat">
+              <span>PUNTOS</span>
+              <strong id="scoreValue">0000</strong>
+            </div>
+            <div class="mini-stat">
+              <span>RÉCORD</span>
+              <strong id="highValue">0000</strong>
+            </div>
+            <div class="mini-stat mini-stat-level">
+              <span>NIVEL</span>
+              <strong id="levelValue">01</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="canvas-frame" id="stage">
+          <canvas id="gameCanvas" role="img" aria-label="Tablero del juego Neon Serpent"></canvas>
+          <div class="stage-glow" aria-hidden="true"></div>
+          <div class="stage-grid" aria-hidden="true"></div>
+          <div class="scanlines" aria-hidden="true"></div>
+          <div class="vignette" aria-hidden="true"></div>
+
+          <span class="corner corner-tl" aria-hidden="true"></span>
+          <span class="corner corner-tr" aria-hidden="true"></span>
+          <span class="corner corner-bl" aria-hidden="true"></span>
+          <span class="corner corner-br" aria-hidden="true"></span>
+
+          <div class="combo-badge" id="comboBadge" aria-hidden="true">
+            <span>COMBO</span>
+            <strong id="comboBadgeValue">x2</strong>
+          </div>
+
+          <div class="level-toast" id="levelToast" role="status" aria-live="polite">
+            <span>VELOCIDAD AUMENTADA</span>
+            <strong id="levelToastValue">NIVEL 02</strong>
+          </div>
+
+          <div class="ready-hint" id="readyHint" hidden>
+            <span class="ready-icon" aria-hidden="true">↔</span>
+            <span class="ready-copy">
+              <strong>ELIGE UNA DIRECCIÓN</strong>
+              <span>Flechas, WASD o desliza para arrancar</span>
+            </span>
+          </div>
+
+          <div class="overlay start-overlay" id="startOverlay">
+            <div class="start-layout">
+              <div class="start-copy">
+                <div class="eyebrow"><span></span> SERPIENTE CLÁSICA, RECARGADA</div>
+                <h1>CAZA.<br>CRECE.<br><em>REPITE.</em></h1>
+                <p class="start-description">Devora los orbes de energía, encadena combos y esquiva tu propia estela. Los orbes dorados valen el triple.</p>
+                <div class="start-actions">
+                  <button class="primary-button" id="startButton" type="button" aria-label="Start">
+                    <span>JUGAR AHORA</span>
+                    <i aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </i>
+                  </button>
+                  <span class="best-inline">MEJOR MARCA <strong id="bestInline">0</strong></span>
+                </div>
+                <div class="start-hints">
+                  <span><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> MOVER</span>
+                  <span><kbd>ESPACIO</kbd> PAUSA</span>
+                </div>
+              </div>
+
+              <div class="start-emblem" aria-hidden="true">
+                <div class="emblem-orbit orbit-one"></div>
+                <div class="emblem-orbit orbit-two"></div>
+                <div class="emblem-core">
+                  <svg viewBox="0 0 220 220" fill="none">
+                    <defs>
+                      <linearGradient id="snakeGradient" x1="44" y1="174" x2="180" y2="48" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#29d8bc"/>
+                        <stop offset=".55" stop-color="#8dff7a"/>
+                        <stop offset="1" stop-color="#d4ff66"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M52 160c0-29 36-34 60-19 25 16 55 8 55-19 0-24-28-32-46-15-16 16-8 39 15 43 35 6 54-19 40-45-8-15-26-19-43-12"
+                      stroke="#8dff7a" stroke-opacity=".12" stroke-width="30" stroke-linecap="round"/>
+                    <path d="M52 160c0-29 36-34 60-19 25 16 55 8 55-19 0-24-28-32-46-15-16 16-8 39 15 43 35 6 54-19 40-45-8-15-26-19-43-12"
+                      stroke="url(#snakeGradient)" stroke-width="16" stroke-linecap="round"/>
+                    <circle cx="138" cy="95" r="3" fill="#07100c"/>
+                    <circle cx="151" cy="88" r="3" fill="#07100c"/>
+                    <path d="m157 79 14-7m-14 14 15 2" stroke="#ff9d5c" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="emblem-label">ENERGY<br>UNIT</div>
+                <div class="emblem-stamp"><span>RÉCORD</span><strong id="emblemHigh">0</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="overlay compact-overlay" id="pauseOverlay" hidden>
+            <div class="pause-panel">
+              <div class="overlay-kicker"><span></span> SEÑAL EN PAUSA</div>
+              <h2>PAUSA</h2>
+              <p>La serpiente espera. Tómate un respiro.</p>
+              <button class="primary-button" id="resumeButton" type="button" aria-label="Resume">
+                <span>REANUDAR</span>
+                <i aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5-10-6.5Z" fill="currentColor"/></svg>
+                </i>
+              </button>
+              <div class="secondary-actions">
+                <button class="text-button" id="pauseRestartButton" type="button">REINICIAR PARTIDA</button>
+                <span>o pulsa <kbd>ESPACIO</kbd></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="overlay compact-overlay" id="gameOverOverlay" hidden>
+            <div class="gameover-panel">
+              <div class="overlay-kicker danger"><span></span> CONEXIÓN PERDIDA</div>
+              <h2>FIN DEL<br><em>JUEGO</em></h2>
+              <div class="result-row">
+                <div><span>PUNTUACIÓN</span><strong id="finalScore">0</strong></div>
+                <div><span>RÉCORD</span><strong id="finalHigh">0</strong></div>
+                <div><span>ORBES</span><strong id="finalFood">0</strong></div>
+              </div>
+              <div class="new-record" id="newRecord" hidden>✦ NUEVO RÉCORD PERSONAL ✦</div>
+              <button class="primary-button" id="playAgainButton" type="button" aria-label="Play again">
+                <span>JUGAR DE NUEVO</span>
+                <i aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </i>
+              </button>
+            </div>
+          </div>
+
+          <div class="sr-only" id="liveRegion" aria-live="polite"></div>
+        </div>
+
+        <div class="arena-foot">
+          <div class="speed-readout">
+            <span class="readout-label">VELOCIDAD</span>
+            <div class="speed-meter" aria-hidden="true"><span id="speedFill"></span></div>
+            <strong id="speedLabel">1.0x</strong>
+          </div>
+          <div class="foot-hint">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M8 8l-4 4 4 4M16 8l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>DESLIZA PARA MOVER</span>
+          </div>
+          <div class="touch-controls" aria-label="Controles táctiles">
+            <button type="button" data-dir="up" aria-label="Arriba">↑</button>
+            <button type="button" data-dir="down" aria-label="Abajo">↓</button>
+            <button type="button" data-dir="left" aria-label="Izquierda">←</button>
+            <button type="button" data-dir="right" aria-label="Derecha">→</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side-panel">
+        <section class="panel-card score-card">
+          <div class="card-label"><span>PUNTUACIÓN</span><span class="badge" id="levelBadge">NIVEL 01</span></div>
+          <div class="score-display">
+            <span id="bigScore">0</span>
+            <span class="score-unit">PTS</span>
+          </div>
+          <div class="record-row"><span>MEJOR MARCA</span><strong id="bigHigh">0</strong></div>
+          <div class="combo-track" aria-hidden="true"><span id="comboFill"></span></div>
+          <div class="combo-row"><span id="comboLabel">SIN COMBO</span><strong id="multiplier">x1</strong></div>
+        </section>
+
+        <section class="panel-card controls-card">
+          <div class="card-label"><span>CONTROLES</span><span class="card-index">01</span></div>
+          <div class="control-primary">
+            <div class="key-cluster" aria-hidden="true">
+              <span></span><kbd>↑</kbd><span></span>
+              <kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd>
+            </div>
+            <div class="control-copy"><strong>MUEVE</strong><span>Flechas o WASD</span></div>
+          </div>
+          <div class="control-row"><kbd>ESPACIO</kbd><span>Pausa la partida</span></div>
+          <div class="control-row"><span class="swipe-symbol" aria-hidden="true">↔</span><span>Desliza en móvil</span></div>
+        </section>
+
+        <section class="panel-card mission-card">
+          <div class="card-label"><span>OBJETIVO</span><span class="pulse-dot"></span></div>
+          <p>Come <strong>5 orbes</strong> para subir de nivel. Cada nivel acelera la serpiente.</p>
+          <div class="progress-dots" id="progressDots" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="mission-meta"><span>PROGRESO DE NIVEL</span><strong id="levelProgress">0 / 5</strong></div>
+          <button class="ghost-button" id="restartSideButton" type="button">REINICIAR PARTIDA</button>
+        </section>
+
+        <blockquote class="side-quote">“La codicia alarga la serpiente.<br>La paciencia rompe el récord.”</blockquote>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <span>NEON SERPENT <i>//</i> ARCADE 2026</span>
+      <span class="footer-center">★ DISEÑADO PARA JUGAR EN CUALQUIER PANTALLA</span>
+      <span>HECHO CON <b>CANVAS</b></span>
+    </footer>
+  </main>
+
+  <script src="game.js" defer></script>
+</body>
+</html>
