@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0410" />
+    <meta name="description" content="Wormate.3D — un juego de gusanos en 3D para móvil y tablet. Come corazones, crece y domina la arena." />
+    <title>Wormate.3D — Aventuras en 3D</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' d='M12 21s-7.5-4.6-9.4-9.1C1.2 8.3 3.2 4.8 6.6 4.2c2-.3 3.9.6 5.4 2.4 1.5-1.8 3.4-2.7 5.4-2.4 3.4.6 5.4 4.1 4 7.7C19.5 16.4 12 21 12 21Z'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="scene" aria-label="Arena 3D de Wormate"></canvas>
+      <div class="scene-shade" aria-hidden="true"></div>
+      <div class="grain" aria-hidden="true"></div>
+
+      <main id="menu" class="menu">
+        <header class="topbar">
+          <div class="brand-mini" aria-hidden="true">
+            <span class="mini-heart"></span>
+            <span>WORMATE<em>.3D</em></span>
+          </div>
+          <div class="top-actions">
+            <span class="online-pill"><i></i><b id="online-count">12</b><span>en línea</span></span>
+            <button id="sound-btn" class="icon-btn" type="button" aria-label="Sonido" aria-pressed="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4Zm-2.5-9v2.1a7 7 0 0 1 0 13.8V21a9 9 0 0 0 0-18Z"/></svg>
+            </button>
+            <button id="settings-btn" class="icon-btn" type="button" aria-label="Ajustes">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m19.4 13 .1-1-.1-1 2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.7-1L15 3.6h-4L10.7 6c-.6.2-1.2.6-1.7 1l-2.4-1-2 3.4 2 1.6-.1 1 .1 1-2 1.6 2 3.4 2.4-1c.5.4 1.1.8 1.7 1l.3 2.4h4l.3-2.4c.6-.2 1.2-.6 1.7-1l2.4 1 2-3.4-2-1.6ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="menu-body">
+          <aside class="panel side-panel intro-panel">
+            <span class="kicker">Bienvenido al jardín</span>
+            <h2>Aventuras sin parar</h2>
+            <p class="side-copy">Desliza, come corazones y haz crecer a tu gusano. Un mundo 3D lleno de luz, color y rivales con hambre.</p>
+            <ul class="feature-list">
+              <li>
+                <span class="feature-ico">01</span>
+                <div><b>Come y crece</b><small>Los corazones y orbes te hacen más largo.</small></div>
+              </li>
+              <li>
+                <span class="feature-ico">02</span>
+                <div><b>Esquiva y domina</b><small>Si tu cabeza choca con otro gusano, pierdes.</small></div>
+              </li>
+              <li>
+                <span class="feature-ico">03</span>
+                <div><b>Acelera con turbo</b><small>Gasta longitud para escapar o atacar.</small></div>
+              </li>
+            </ul>
+            <button id="howto-btn" class="text-btn" type="button">Cómo jugar <span aria-hidden="true">→</span></button>
+          </aside>
+
+          <section class="hero">
+            <div class="season-chip"><span class="chip-heart"></span><span id="season-label">Temporada de Amor</span></div>
+            <h1 class="logo"><span>WORMATE</span><span class="logo-3d">.3D</span></h1>
+            <p class="tagline">Un jardín de corazones. Un solo gusano. Toda la arena para ti.</p>
+
+            <div class="play-card">
+              <label class="field-label" for="nickname">Tu apodo</label>
+              <div class="name-field">
+                <span id="avatar" class="avatar" aria-hidden="true">IN</span>
+                <input id="nickname" name="nickname" maxlength="14" autocomplete="nickname" spellcheck="false" placeholder="Invitado" value="Invitado" />
+                <button id="random-name" class="dice-btn" type="button" aria-label="Nombre aleatorio">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm3.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm7 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm-7 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm7 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm-3.5-3.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></svg>
+                </button>
+              </div>
+
+              <div class="arena-picker">
+                <span class="field-label">Arena</span>
+                <div class="arena-options" role="group" aria-label="Elige una arena">
+                  <button class="arena-btn is-active" type="button" data-theme="love"><span class="swatch swatch-love"></span>Jardín de Amor</button>
+                  <button class="arena-btn" type="button" data-theme="neon"><span class="swatch swatch-neon"></span>Noche Neón</button>
+                </div>
+              </div>
+
+              <button id="play-btn" class="btn-play" type="button" aria-label="Play game">
+                <span class="btn-play-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+                </span>
+                <span class="btn-play-text"><b>Jugar</b><small>Entrar a la arena</small></span>
+                <span class="btn-play-glow" aria-hidden="true"></span>
+              </button>
+
+              <div class="quick-row">
+                <button id="skins-btn" class="btn-soft" type="button">
+                  <span class="mini-worm" id="mini-worm" aria-hidden="true"><i></i><i></i><i></i></span>
+                  Skins
+                </button>
+                <button id="help-btn" class="btn-soft" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm.1 15.5a1.4 1.4 0 1 1 0-2.8 1.4 1.4 0 0 1 0 2.8Zm1.6-4.7c-.7.5-1 .8-1 1.6h-1.9c0-1.5.5-2.1 1.5-2.8.6-.4.9-.7.9-1.3 0-.7-.5-1.1-1.2-1.1-.8 0-1.3.5-1.4 1.3H8.7c.1-1.8 1.3-3 3.4-3 1.9 0 3.2 1 3.2 2.6 0 1.1-.6 1.8-1.6 2.5Z"/></svg>
+                  Cómo jugar
+                </button>
+              </div>
+            </div>
+
+            <p class="best-inline">Récord personal <b id="best-inline">0</b> pts</p>
+          </section>
+
+          <aside class="panel side-panel board-panel">
+            <div class="panel-head">
+              <h2>Clasificación</h2>
+              <span class="season-tag" id="menu-season">Amor</span>
+            </div>
+            <ol id="menu-board" class="board-list"></ol>
+            <div class="record-card">
+              <span class="record-label">Tu mejor marca</span>
+              <strong id="best-score">0</strong>
+              <span class="record-unit">puntos</span>
+              <span class="record-heart" aria-hidden="true"></span>
+            </div>
+            <p class="panel-note">Los jugadores de la arena se actualizan en tiempo real.</p>
+          </aside>
+        </div>
+
+        <footer class="menu-footer">
+          <button id="lang-btn" class="footer-chip" type="button">Idioma · ES</button>
+          <span class="footer-links">
+            <button type="button" data-modal="about">Portada</button>
+            <button type="button" data-modal="privacy">Política priv.</button>
+            <button type="button" data-modal="support">Soporte</button>
+          </span>
+          <span class="footer-tech">3D · WebGL · Phone / Tablet</span>
+        </footer>
+      </main>
+
+      <section id="hud" class="hud hidden" aria-label="Interfaz de juego">
+        <div class="hud-top">
+          <div class="player-card">
+            <span id="hud-avatar" class="avatar avatar-sm" aria-hidden="true">IN</span>
+            <span class="player-info">
+              <b id="hud-name">Invitado</b>
+              <small><span id="hud-score">0</span> pts · <span id="hud-length">30</span> m</small>
+            </span>
+            <button id="pause-btn" class="icon-btn icon-btn-sm" type="button" aria-label="Pausa">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7V5Zm6.5 0H17v14h-3.5V5Z"/></svg>
+            </button>
+          </div>
+
+          <div class="leaderboard-card">
+            <div class="lb-head"><span>Clasificación</span><b id="lb-rank">#1</b></div>
+            <ol id="lb-list"></ol>
+          </div>
+
+          <div class="map-wrap">
+            <canvas id="minimap" width="180" height="180" aria-label="Minimapa"></canvas>
+            <span class="map-label">Arena</span>
+          </div>
+        </div>
+
+        <div class="hud-bottom">
+          <div id="joystick" class="joystick" aria-hidden="true">
+            <div class="joy-base"><div id="joy-knob" class="joy-knob"></div></div>
+            <span class="joy-label">Arrastra</span>
+          </div>
+
+          <p id="hud-hint" class="hud-hint">Arrastra para moverte · toca la derecha para turbo</p>
+
+          <button id="boost-btn" class="boost-btn" type="button" aria-label="Turbo">
+            <span class="boost-ring" aria-hidden="true"></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4 13.4h6L9.5 22 20 10.2h-6.6L13.5 2Z"/></svg>
+            <small>Turbo</small>
+          </button>
+        </div>
+      </section>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <section id="death" class="overlay hidden" aria-labelledby="death-title">
+        <div class="result-card">
+          <div class="result-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.4-9.1C1.2 8.3 3.2 4.8 6.6 4.2c2-.3 3.9.6 5.4 2.4 1.5-1.8 3.4-2.7 5.4-2.4 3.4.6 5.4 4.1 4 7.7C19.5 16.4 12 21 12 21Z"/></svg>
+          </div>
+          <span class="kicker">Fin de la partida</span>
+          <h2 id="death-title">¡Te has estrellado!</h2>
+          <p id="death-reason" class="result-copy">Otro gusano se cruzó en tu camino.</p>
+          <div class="result-stats">
+            <div><span>Puntos</span><b id="death-score">0</b></div>
+            <div><span>Longitud</span><b id="death-length">0</b></div>
+            <div><span>Puesto</span><b id="death-rank">#0</b></div>
+          </div>
+          <button id="respawn-btn" class="btn-play" type="button" aria-label="Play again">
+            <span class="btn-play-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></span>
+            <span class="btn-play-text"><b>Reaparecer</b><small>Volver a la arena</small></span>
+            <span class="btn-play-glow" aria-hidden="true"></span>
+          </button>
+          <button id="death-menu-btn" class="btn-ghost" type="button">Volver al menú</button>
+        </div>
+      </section>
+
+      <section id="pause" class="overlay hidden" aria-labelledby="pause-title">
+        <div class="result-card result-card-sm">
+          <span class="kicker">Un respiro</span>
+          <h2 id="pause-title">Pausa</h2>
+          <p class="result-copy">Tu gusano te espera.</p>
+          <button id="resume-btn" class="btn-play" type="button">
+            <span class="btn-play-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></span>
+            <span class="btn-play-text"><b>Continuar</b><small>Volver al juego</small></span>
+            <span class="btn-play-glow" aria-hidden="true"></span>
+          </button>
+          <button id="pause-menu-btn" class="btn-ghost" type="button">Salir al menú</button>
+        </div>
+      </section>
+
+      <div id="modal-root" class="modal-root hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-backdrop" data-close-modal></div>
+        <div class="modal-card">
+          <button class="modal-close" type="button" aria-label="Cerrar" data-close-modal>×</button>
+          <div id="modal-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
