@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#12050d">
+  <meta name="description" content="Wormate 3D: un juego de gusanos de caramelo en 3D para móvil y tablet.">
+  <title>WORMATE 3D — Temporada de Amor</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23ff5f8f'/%3E%3Cpath d='M50 78C30 62 18 50 18 37c0-9 7-15 15-15 7 0 12 3 17 10 5-7 10-10 17-10 8 0 15 6 15 15 0 13-12 25-32 41z' fill='%23fff2f7'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="scene" aria-label="Mundo 3D de Wormate"></canvas>
+    <div class="vignette"></div>
+    <div id="boundary-warning" class="boundary-warning"></div>
+
+    <div id="hud" class="hud">
+      <div class="hud-top-left">
+        <div class="score-card glass">
+          <div class="score-heart">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21C6.4 16.8 2.5 13.4 2.5 9.2 2.5 6.1 4.8 4 7.6 4c1.6 0 3.1.8 4.4 2.5C13.3 4.8 14.8 4 16.4 4c2.8 0 5.1 2.1 5.1 5.2 0 4.2-3.9 7.6-9.5 11.8z"/></svg>
+          </div>
+          <div class="score-copy">
+            <span class="score-label" data-i18n="score">PUNTOS</span>
+            <strong id="score">0</strong>
+          </div>
+          <div class="rank-badge" id="rank-badge">#1</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-pill glass">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg>
+            <span id="length">14</span>
+            <span class="stat-label" data-i18n="length">LONGITUD</span>
+          </div>
+          <div id="combo-pill" class="stat-pill combo-pill glass">x1</div>
+        </div>
+      </div>
+
+      <button id="pause-button" class="icon-button glass" aria-label="Pausa" data-i18n-aria="pause">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>
+      </button>
+
+      <div class="leaderboard glass">
+        <div class="lb-head">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0V4zM8 6H4v2a4 4 0 0 0 4 4M16 6h4v2a4 4 0 0 1-4 4M12 13v5M8 21h8"/></svg>
+          <span data-i18n="ranking">RANKING</span>
+        </div>
+        <ol id="leaderboard-list"></ol>
+      </div>
+
+      <div class="minimap-wrap glass">
+        <canvas id="minimap" width="240" height="240" aria-hidden="true"></canvas>
+        <span class="minimap-label" data-i18n="map">MAPA</span>
+      </div>
+
+      <button id="boost-button" class="boost-button" aria-label="Turbo" data-i18n-aria="boost">
+        <span class="boost-ring"></span>
+        <span class="boost-inner">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 10-13h-7l1-7z"/></svg>
+          <span data-i18n="boost">TURBO</span>
+        </span>
+      </button>
+
+      <div id="joystick" class="joystick"><div id="joystick-thumb"></div></div>
+      <div id="aim-ring" class="aim-ring"></div>
+      <div id="toast" class="toast"></div>
+    </div>
+    <div id="pop-layer" class="pop-layer"></div>
+
+    <main id="menu" class="menu">
+      <aside class="menu-side left glass">
+        <span class="eyebrow" data-i18n="yourBest">TU MEJOR MARCA</span>
+        <strong id="best-score" class="best-value">0</strong>
+        <span class="best-sub" data-i18n="bestSub">Cada partida cuenta</span>
+        <div class="side-divider"></div>
+        <span class="eyebrow" data-i18n="topToday">TOP DE HOY</span>
+        <div id="menu-top" class="menu-top"></div>
+      </aside>
+
+      <div class="menu-card glass">
+        <div class="logo-wrap">
+          <span class="sparkle sparkle-1"></span>
+          <span class="sparkle sparkle-2"></span>
+          <span class="sparkle sparkle-3"></span>
+          <div class="season-pill">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21C6.4 16.8 2.5 13.4 2.5 9.2 2.5 6.1 4.8 4 7.6 4c1.6 0 3.1.8 4.4 2.5C13.3 4.8 14.8 4 16.4 4c2.8 0 5.1 2.1 5.1 5.2 0 4.2-3.9 7.6-9.5 11.8z"/></svg>
+            <span id="season-label">Temporada de Amor</span>
+          </div>
+          <h1 class="logo" aria-label="Wormate 3D">
+            <span class="logo-word">WORMATE</span>
+            <span class="logo-badge">3D</span>
+          </h1>
+          <p class="tagline" data-i18n="tagline">Come dulces. Crece. Rodea a tus rivales.</p>
+        </div>
+
+        <label class="field" for="nickname">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/></svg>
+          <input id="nickname" maxlength="14" placeholder="Tu apodo" autocomplete="off" spellcheck="false" aria-label="Tu apodo">
+          <span class="field-hint" data-i18n="guest">INVITADO</span>
+        </label>
+
+        <div class="section-label"><span data-i18n="arena">ARENA</span><span class="section-line"></span></div>
+        <div id="arena-row" class="arena-row">
+          <button class="arena-chip active" data-theme="romantic">
+            <span class="chip-dot" style="--dot:#ff5f8f"></span>
+            <span data-i18n="arenaRomantic">Corazón</span>
+          </button>
+          <button class="arena-chip" data-theme="neon">
+            <span class="chip-dot" style="--dot:#26e6ff"></span>
+            <span data-i18n="arenaNeon">Neón</span>
+          </button>
+          <button class="arena-chip" data-theme="pastel">
+            <span class="chip-dot" style="--dot:#ffb3c7"></span>
+            <span data-i18n="arenaPastel">Pastel</span>
+          </button>
+        </div>
+
+        <div class="section-label"><span data-i18n="skin">COLOR DEL GUSANO</span><span class="section-line"></span></div>
+        <div id="skin-row" class="skin-row"></div>
+
+        <button id="play-button" class="primary-button">
+          <span class="play-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5z"/></svg>
+          </span>
+          <span data-i18n="play">JUGAR</span>
+          <span class="button-shine"></span>
+        </button>
+
+        <div class="secondary-row">
+          <button id="how-button" class="secondary-button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 9a2.5 2.5 0 1 1 3.7 2.2c-.8.5-1.2 1-1.2 1.8v.5M12 17h.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/></svg>
+            <span data-i18n="how">CÓMO JUGAR</span>
+          </button>
+          <button id="settings-button" class="secondary-button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 1.7-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.4v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L7 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H5.7v-2.4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L7 8.6 8.7 7l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2h2.4v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1L18.8 8l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2V13h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg>
+            <span data-i18n="settings">AJUSTES</span>
+          </button>
+        </div>
+
+        <div class="menu-footer">
+          <button id="language-button" class="link-button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9S14.4 18.5 12 21c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3z"/></svg>
+            <span id="language-label">ES</span>
+          </button>
+          <span class="footer-dot"></span>
+          <button id="privacy-button" class="link-button" data-i18n="privacy">Privacidad</button>
+          <span class="footer-dot"></span>
+          <a class="link-button" href="https://github.com/antos-12/PlayGround/issues" target="_blank" rel="noreferrer" data-i18n="support">Soporte</a>
+        </div>
+      </div>
+
+      <aside class="menu-side right glass">
+        <span class="eyebrow" data-i18n="seasonGoal">META DE TEMPORADA</span>
+        <div class="goal">
+          <span data-i18n="reach">Llega al</span>
+          <strong>#1</strong>
+        </div>
+        <p data-i18n="seasonGoalSub">Rodea a los rivales, roba sus dulces y domina el jardín.</p>
+        <div class="goal-hearts">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </aside>
+    </main>
+
+    <div id="loading" class="loading">
+      <div class="loader-heart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21C6.4 16.8 2.5 13.4 2.5 9.2 2.5 6.1 4.8 4 7.6 4c1.6 0 3.1.8 4.4 2.5C13.3 4.8 14.8 4 16.4 4c2.8 0 5.1 2.1 5.1 5.2 0 4.2-3.9 7.6-9.5 11.8z"/></svg>
+      </div>
+      <span data-i18n="loading">Preparando el jardín...</span>
+    </div>
+
+    <div id="modal-backdrop" class="modal-backdrop hidden">
+      <div class="modal glass" role="dialog" aria-modal="true">
+        <button id="modal-close" class="modal-close" aria-label="Cerrar">×</button>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three.module.js",
+        "three/addons/": "./vendor/addons/"
+      }
+    }
+  </script>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
