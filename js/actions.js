@@ -148,21 +148,18 @@ function submitStudio(event) {
     return;
   }
   topicField.classList.remove('is-invalid');
-  const input = {
-    topic,
-    platform: $('#studio-platform').value,
-    duration: Number($('#studio-duration').value),
-    style: $('#studio-style').value,
-    format: $('#studio-format').value,
-    art: $('#studio-art').value.trim() || 'Fondo oscuro, luz suave, acento verde lima'
-  };
+  const input = readStudioForm();
+  ui.studioImageErrors = {};
+  ui.studioImageBusy.clear();
+  ui.studioBatch = null;
   const result = generateStoryboard(input);
   state.lastStoryboard = result;
   saveState();
   renderStoryboardResult(result);
   renderAll();
+  loadStudioImageStatus();
   scrollToOutput('.studio-output-panel');
-  toast('Storyboard creado con prompts de animación.');
+  toast('Storyboard creado. Genera las imágenes o revisa los prompts.');
 }
 
 function generatorBody(result) {
@@ -232,23 +229,36 @@ function copyGenerator() {
 }
 
 function storyboardBody(result) {
+  const total = storyboardTotalDuration(result);
   return `STORYBOARD · ${result.input.topic}
 Plataforma: ${result.input.platform}
-Duración: ${result.input.duration} s
+Duración total: ${total} s (suma de ${result.scenes.length} escenas)
+Formato: 9:16
 Estilo: ${result.input.style}
-Formato: ${result.input.format}
+Formato narrativo: ${result.input.format}
+
+FICHA MAESTRA
+Personajes: ${result.input.characters}
+Vestuario: ${result.input.wardrobe}
+Escenarios: ${result.input.locations}
+Iluminación: ${result.input.lighting}
 Dirección de arte: ${result.input.art}
+Referencia visual: ${result.input.referenceImage ? 'Incluida en el proyecto' : 'Sin imagen de referencia'}
 
 PROMPT MAESTRO
 ${result.masterPrompt}
 
-${result.scenes.map((scene) => `ESCENA ${scene.number} · ${scene.title} · ${scene.time}
-Fotograma inicial: ${scene.startFrame}
-Fotograma final: ${scene.endFrame}
+${result.scenes.map((scene) => `ESCENA ${scene.number} · ${scene.title} · ${scene.time} · ${scene.duration} s
+Descripción visual: ${scene.visual}
+Prompt imagen inicial: ${scene.startPrompt}
+Imagen inicial: ${scene.images?.start ? 'Generada' : 'Pendiente'}
+Prompt imagen final${scene.includeEnd ? '' : ' (omitido)'}: ${scene.includeEnd ? scene.endPrompt : 'Sin frame final'}
+Imagen final: ${scene.includeEnd ? (scene.images?.end ? 'Generada' : 'Pendiente') : 'Omitida'}
 Acción: ${scene.action}
-Cámara: ${scene.camera}
+Movimiento de cámara: ${scene.camera}
 Encuadre: ${scene.framing}
 Transición: ${scene.transition}
+Duración individual: ${scene.duration} s
 Prompt de animación: ${scene.animationPrompt}`).join('\n\n')}`;
 }
 
@@ -381,6 +391,41 @@ function handleAction(action, element) {
     case 'copy-storyboard':
       copyStoryboard();
       break;
+    case 'generate-all-images':
+      generateAllStoryboardImages();
+      break;
+    case 'retry-failed-images':
+      retryFailedStoryboardImages();
+      break;
+    case 'generate-scene-image':
+      generateSceneImage(Number(element.dataset.index), element.dataset.kind || 'start').catch(() => undefined);
+      break;
+    case 'download-scene-image':
+      downloadSceneImage(Number(element.dataset.index), element.dataset.kind || 'start');
+      break;
+    case 'download-storyboard-images':
+      downloadStoryboardImages();
+      break;
+    case 'export-storyboard':
+      exportStoryboardProject();
+      break;
+    case 'toggle-scene-end':
+      toggleSceneEnd(Number(element.dataset.index));
+      break;
+    case 'generate-animation-prompts':
+      regenerateAnimationPrompts();
+      break;
+    case 'regenerate-animation-prompt':
+      regenerateAnimationPrompts(Number(element.dataset.index));
+      break;
+    case 'copy-scene-image-prompt': {
+      const index = Number(element.dataset.index);
+      const kind = element.dataset.kind === 'end' ? 'end' : 'start';
+      const scene = state.lastStoryboard?.scenes?.[index];
+      const prompt = kind === 'end' ? scene?.endPrompt : scene?.startPrompt;
+      if (prompt) copyText(prompt, `Prompt de imagen ${kind === 'end' ? 'final' : 'inicial'} copiado.`);
+      break;
+    }
     case 'copy-avatar-kit':
       copyAvatarKit();
       break;
@@ -533,6 +578,17 @@ function bindEvents() {
   $('#generator-form').addEventListener('submit', submitGenerator);
   $('#avatar-form').addEventListener('submit', submitAvatar);
   $('#studio-form').addEventListener('submit', submitStudio);
+  $('#studio-reference')?.addEventListener('change', (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    handleStudioReferenceFile(file);
+  });
+  $('#studio-reference-clear')?.addEventListener('click', clearStudioReference);
+  document.addEventListener('change', (event) => {
+    const input = event.target.closest('[data-scene-duration]');
+    if (!input) return;
+    updateSceneDuration(Number(input.dataset.sceneDuration), input.value);
+  });
 
   $('#gen-topic').addEventListener('input', (event) => {
     const count = $('#gen-topic-count');
@@ -628,6 +684,9 @@ function registerServiceWorker() {
 function init() {
   bindEvents();
   fillAvatarForm(state.lastAvatar?.input);
+  fillStudioForm(state.lastStoryboard?.input);
+  renderStudioImageStatus();
+  loadStudioImageStatus();
   const route = routeFromHash();
   if (!location.hash) history.replaceState(null, '', '#inicio');
   showRoute(route, { scroll: false });

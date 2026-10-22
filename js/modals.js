@@ -336,7 +336,8 @@ function openSettings() {
     metrics: state.metrics.length,
     incomes: state.incomes.length,
     library: state.library.length,
-    avatars: state.avatars.length
+    avatars: state.avatars.length,
+    storyboardImages: (state.lastStoryboard?.scenes || []).reduce((total, scene) => total + Number(Boolean(scene.images?.start)) + Number(Boolean(scene.images?.end)), 0)
   };
   const body = `<div class="settings-profile">
       <span class="profile-avatar${state.profile.avatarUrl ? ' has-image' : ''}">${state.profile.avatarUrl ? `<img src="${esc(state.profile.avatarUrl)}" alt="">` : esc((state.profile.name || 'C').charAt(0).toUpperCase())}</span>
@@ -347,10 +348,11 @@ function openSettings() {
       <label class="field"><span>Nombre visible</span><input id="settings-name" type="text" maxlength="40" value="${esc(state.profile.name || '')}" placeholder="Tu nombre o marca"></label>
     </div>
     <div class="settings-group">
-      <h4>Generador de avatares IA</h4>
-      <p class="fine-print" style="margin:0 0 9px">El motor principal es Flux Dev en modo gratuito. Si está ocupado, la app intenta un respaldo con Pollinations. Puedes añadir tu propia clave de Pollinations para ese respaldo. La clave se guarda solo en este dispositivo.</p>
-      <label class="field"><span>Clave de Pollinations <em>opcional</em></span><input id="settings-pollinations-key" type="password" maxlength="160" value="${esc(state.settings.pollinationsKey || '')}" placeholder="sk_… o pk_…" autocomplete="off" spellcheck="false"></label>
-      <p class="fine-print"><a class="text-link" href="https://enter.pollinations.ai" target="_blank" rel="noreferrer">Obtener una clave de respaldo ${icon('i-arrow-up-right')}</a></p>
+      <h4>Generación de imágenes</h4>
+      <p class="fine-print" style="margin:0 0 9px">Las claves se configuran solo en el servidor mediante variables de entorno. El navegador nunca recibe ni guarda claves de API.</p>
+      <div class="settings-row"><span>Motor actual</span><strong>${ui.imageStatus?.primary ? `${esc(ui.imageStatus.primary.label)} · ${esc(ui.imageStatus.primary.model)}` : (ui.imageStatusError ? 'Sin conexión' : 'Comprobando…')}</strong></div>
+      <div class="settings-row"><span>Referencias visuales</span><strong>${ui.imageStatus?.supportsReference ? 'Activadas' : 'No disponibles'}</strong></div>
+      <p class="fine-print">Configura <code>GEMINI_API_KEY</code>, <code>OPENAI_API_KEY</code> o <code>IMAGE_PROVIDER</code> en el archivo <code>.env</code> del servidor.</p>
     </div>
     <div class="settings-group">
       <h4>Almacenamiento de este dispositivo</h4>
@@ -360,6 +362,7 @@ function openSettings() {
       <div class="settings-row"><span>Monetización</span><strong>${counts.incomes} ${counts.incomes === 1 ? 'ingreso' : 'ingresos'}</strong></div>
       <div class="settings-row"><span>Biblioteca</span><strong>${counts.library} elementos</strong></div>
       <div class="settings-row"><span>Avatares IA</span><strong>${counts.avatars} de 8</strong></div>
+      <div class="settings-row"><span>Storyboard actual</span><strong>${counts.storyboardImages} imágenes</strong></div>
       <div class="settings-actions" style="margin-top:10px">
         <button class="btn btn-small btn-ghost" type="button" data-action="export-data">${icon('i-download')}Exportar JSON</button>
         <button class="btn btn-small btn-ghost" type="button" data-action="import-data">${icon('i-upload')}Importar</button>
@@ -405,9 +408,7 @@ function saveSettings() {
   const input = $('#settings-name');
   if (!input) return;
   const name = input.value.trim().slice(0, 40) || 'Creador';
-  const keyInput = $('#settings-pollinations-key');
   state.profile.name = name;
-  if (keyInput) state.settings.pollinationsKey = keyInput.value.trim().slice(0, 160);
   saveState();
   renderProfile();
   renderAvatarFromState();

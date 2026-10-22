@@ -319,83 +319,238 @@ function renderGeneratorResult(result, scroll = true) {
   if (scroll) output.scrollTop = 0;
 }
 
+function distributeSceneDurations(total, weights) {
+  const values = weights.map((weight) => Math.max(2, Math.round(total * weight)));
+  let difference = total - values.reduce((sum, value) => sum + value, 0);
+  let guard = 0;
+  while (difference !== 0 && guard < 500) {
+    const index = difference > 0 ? guard % values.length : values.length - 1 - (guard % values.length);
+    if (difference < 0 && values[index] <= 2) {
+      guard += 1;
+      continue;
+    }
+    values[index] += difference > 0 ? 1 : -1;
+    difference += difference > 0 ? -1 : 1;
+    guard += 1;
+  }
+  return values;
+}
+
+function storyboardTotalDuration(result) {
+  return (result?.scenes || []).reduce((total, scene) => total + Number(scene.duration || 0), 0);
+}
+
+function recalculateSceneTiming(result) {
+  let elapsed = 0;
+  result.scenes.forEach((scene) => {
+    const duration = Math.max(2, Math.min(20, Math.round(Number(scene.duration) || 2)));
+    scene.duration = duration;
+    scene.start = elapsed;
+    scene.end = elapsed + duration;
+    scene.time = `${elapsed}–${elapsed + duration} s`;
+    elapsed += duration;
+  });
+  result.totalDuration = elapsed;
+  return elapsed;
+}
+
+function masterSubject(input) {
+  return `${input.characters || 'una creadora'} con ${input.wardrobe || 'vestuario coherente'}`;
+}
+
+function sceneLocation(input) {
+  return input.locations || 'un espacio coherente con la marca';
+}
+
+function buildSceneImagePrompt(result, scene, kind = 'start') {
+  const input = result.input;
+  const style = result.style || STYLE_DATA[input.style] || STYLE_DATA['Cinemático'];
+  const base = kind === 'start'
+    ? scene.visual
+    : `${scene.visual} En el punto final del movimiento: ${scene.action}`;
+  return `Vertical 9:16 cinematic still for ${input.platform}. Scene ${scene.number}, ${base} Character: ${input.characters}. Wardrobe: ${input.wardrobe}. Location: ${input.locations}. Lighting: ${input.lighting}. Style: ${input.style}, ${style.palette}, ${style.texture}. Composition: ${scene.framing}. Keep the master sheet consistent. Natural realistic detail, no text, no logo, no watermark, no collage, no split screen.`;
+}
+
+function buildSceneAnimationPrompt(result, scene) {
+  const style = result.style || STYLE_DATA[result.input.style] || STYLE_DATA['Cinemático'];
+  const motions = [
+    'subtle natural movement with a stable, controlled pace',
+    'gentle weight shift and small environmental motion',
+    'smooth continuous motion with a soft settle at the end',
+    'quiet realistic movement, keeping the framing clean'
+  ];
+  const revision = Number(scene.promptRevision || 0);
+  const character = (result.input.characters || 'the creator').split(',')[0].trim();
+  return `${scene.camera}. ${scene.action} ${character} stays visually consistent. ${motions[revision % motions.length]}. ${scene.duration}s single continuous vertical 9:16 shot from the initial frame to the final frame; ${style.motion}; no cuts, no text, no logos.`;
+}
+
 function generateStoryboard(input) {
   const style = STYLE_DATA[input.style] || STYLE_DATA['Cinemático'];
   const beats = FORMAT_BEATS[input.format] || FORMAT_BEATS['Tutorial paso a paso'];
   const sceneCount = input.duration <= 15 ? 4 : 5;
   const selectedBeats = beats.slice(0, sceneCount);
-  const ratios = sceneCount === 4 ? [0.16, 0.27, 0.33, 0.24] : [0.12, 0.18, 0.24, 0.24, 0.22];
-  let elapsed = 0;
+  const weights = sceneCount === 4 ? [0.16, 0.27, 0.33, 0.24] : [0.12, 0.18, 0.24, 0.24, 0.22];
+  const durations = distributeSceneDurations(input.duration, weights);
   const framings = ['Primer plano vertical', 'Plano medio', 'Plano detalle', 'Plano medio con movimiento', 'Plano general del resultado'];
   const cameras = ['Acercamiento lento', 'Paneo lateral suave', 'Seguimiento a mano', 'Órbita controlada', 'Alejamiento lento'];
   const transitions = ['Corte directo al compás', 'Transición por movimiento', 'Match cut', 'Fundido corto', 'Corte limpio al CTA'];
+  const shots = ['primer plano a cámara', 'plano medio con el producto en contexto', 'b-roll del proceso', 'plano detalle del resultado', 'plano medio final con espacio para CTA'];
+  const subject = input.topic.trim().replace(/[.!?]+$/, '');
+  let elapsed = 0;
   const scenes = selectedBeats.map((beat, index) => {
-    const start = Math.round(elapsed);
-    elapsed += input.duration * ratios[index];
-    const end = index === selectedBeats.length - 1 ? input.duration : Math.round(elapsed);
+    const duration = durations[index];
+    const start = elapsed;
+    const end = start + duration;
+    elapsed = end;
     const framing = framings[index] || framings[framings.length - 1];
     const camera = cameras[index] || cameras[cameras.length - 1];
     const transition = transitions[index] || transitions[transitions.length - 1];
-    const subject = input.topic.trim().replace(/[.!?]+$/, '');
-    const startFrame = `${framing} de ${subject.toLowerCase()} en ${input.art}. ${style.lighting}, ${style.camera}. Fondo coherente con ${style.palette}.`;
-    const endFrame = `${framing} del resultado de ${subject.toLowerCase()}, composición más cerrada y limpia. ${style.lighting}. Se mantiene ${style.palette}.`;
-    const animationPrompt = `Vertical 9:16 ${input.style.toLowerCase()} shot for ${input.platform}. Start frame: ${startFrame} End frame: ${endFrame} Camera: ${camera.toLowerCase()}, ${style.motion}. Motion: subtle realistic movement, smooth transition. Lighting: ${style.lighting}. Palette: ${style.palette}. Texture: ${style.texture}. Duration: 4-6 seconds. No text overlays, no logos, no watermarks.`;
-    return {
+    const visual = `${shots[index] || shots[shots.length - 1]} de ${subject.toLowerCase()}. ${index === 0 ? `Abre con una imagen clara de ${input.characters || 'la persona principal'} en ${input.locations || 'el escenario principal'}.` : `Ilustra ${beat.toLowerCase()} en ${input.locations || 'el escenario principal'} sin perder la continuidad.`}`;
+    const action = index === 0
+      ? `Presenta el gancho visual con ${subject.toLowerCase()} y mira a cámara al final del plano.`
+      : index === selectedBeats.length - 1
+        ? 'Cierra con el resultado visible y deja aire para el texto final.'
+        : `Muestra ${beat.toLowerCase()} con un recurso visual concreto y un gesto natural.`;
+    const scene = {
       number: index + 1,
       title: beat,
-      time: `${start}–${Math.max(end, start + 2)} s`,
+      duration,
+      start,
+      end,
+      time: `${start}–${end} s`,
       framing,
-      action: index === 0
-        ? `Presenta el gancho visual con ${subject.toLowerCase()}.`
-        : index === selectedBeats.length - 1
-          ? 'Cierra con el resultado y deja aire para el texto final.'
-          : `Muestra ${beat.toLowerCase()} con un recurso visual concreto.`,
+      visual,
+      action,
       camera,
       transition,
-      startFrame,
-      endFrame,
-      animationPrompt
+      includeEnd: true,
+      promptRevision: 0,
+      images: { start: null, end: null }
     };
+    scene.startPrompt = buildSceneImagePrompt({ input, style }, scene, 'start');
+    scene.endPrompt = buildSceneImagePrompt({ input, style }, scene, 'end');
+    scene.animationPrompt = buildSceneAnimationPrompt({ input, style }, scene);
+    return scene;
   });
-  return {
+  const result = {
     id: uid('story'),
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     input,
     style,
     scenes,
-    masterPrompt: `Create a cohesive ${input.style.toLowerCase()} vertical video for ${input.platform}, 9:16, about "${input.topic.trim()}". Visual direction: ${input.art}. Palette: ${style.palette}. Lighting: ${style.lighting}. Camera: ${style.camera}. Motion: ${style.motion}. Texture: ${style.texture}. Keep character, wardrobe and location consistent across all scenes. No text overlays, no logos, no watermarks.`
+    masterPrompt: `Create a cohesive ${input.style.toLowerCase()} vertical 9:16 video for ${input.platform} about "${subject}". Master sheet — characters: ${input.characters}. Wardrobe: ${input.wardrobe}. Locations: ${input.locations}. Lighting: ${input.lighting}. Visual direction: ${input.art}. Palette: ${style.palette}. Camera: ${style.camera}. Motion: ${style.motion}. Texture: ${style.texture}. Keep character, wardrobe and location consistent across all scenes. No text overlays, no logos, no watermarks.`
   };
+  recalculateSceneTiming(result);
+  return result;
 }
 
-function storyboardSceneHTML(scene) {
-  return `<article class="storyboard-card">
+function sceneImageMeta(image) {
+  if (!image) return '';
+  const names = { pollinations: 'Pollinations', pixelster: 'Flux', gemini: 'Gemini', openai: 'OpenAI' };
+  const provider = names[image.provider] || image.provider || 'IA';
+  return `${provider}${image.referenceUsed ? ' · referencia' : ''}`;
+}
+
+function sceneFrameHTML(result, scene, kind) {
+  const index = scene.number - 1;
+  const key = `${index}-${kind}`;
+  const isEnd = kind === 'end';
+  const prompt = isEnd ? scene.endPrompt : scene.startPrompt;
+  const image = scene.images?.[kind] || null;
+  const busy = ui.studioImageBusy.has(key);
+  const error = ui.studioImageErrors[key];
+  const label = isEnd ? 'Imagen final' : 'Imagen inicial';
+  if (isEnd && !scene.includeEnd) {
+    return `<div class="studio-frame is-off">
+      <div class="studio-frame-head"><span>${label} · opcional</span><span>Omitido</span></div>
+      <div class="studio-frame-omitted"><span>Sin frame final</span><button class="btn btn-tiny btn-ghost" type="button" data-action="toggle-scene-end" data-index="${index}">Añadir final</button></div>
+    </div>`;
+  }
+  return `<div class="studio-frame ${isEnd ? 'is-end' : ''}">
+    <div class="studio-frame-head"><span>${label}</span><span>${image ? esc(sceneImageMeta(image)) : 'Pendiente'}</span></div>
+    <div class="studio-frame-media ${image ? 'has-image' : ''}">
+      ${image
+        ? `<img src="${image.image}" alt="${esc(label)} de la escena ${scene.number}: ${esc(scene.title)}" loading="lazy">`
+        : `<div class="studio-frame-placeholder">${icon('i-image')}<span>${prompt ? 'Lista para generar' : 'Sin prompt'}</span></div>`}
+      ${busy ? `<div class="studio-frame-busy"><span class="spinner"></span><small>Generando…</small></div>` : ''}
+      <span class="studio-frame-ratio">9:16</span>
+    </div>
+    ${error ? `<p class="studio-frame-error">${icon('i-info')}${esc(error)} <button type="button" data-action="generate-scene-image" data-index="${index}" data-kind="${kind}">Reintentar</button></p>` : ''}
+    <div class="studio-frame-actions">
+      <button class="btn btn-tiny ${image ? 'btn-ghost' : 'btn-primary'}" type="button" data-action="generate-scene-image" data-index="${index}" data-kind="${kind}" ${busy || !prompt ? 'disabled' : ''}>${icon('i-refresh')}${image ? 'Regenerar' : 'Generar'}</button>
+      ${image ? `<button class="btn btn-tiny btn-ghost" type="button" data-action="download-scene-image" data-index="${index}" data-kind="${kind}">${icon('i-download')}Descargar</button>` : ''}
+      ${isEnd ? `<button class="btn btn-tiny btn-ghost" type="button" data-action="toggle-scene-end" data-index="${index}">${icon('i-x')}Quitar final</button>` : ''}
+    </div>
+    <details class="studio-frame-prompt">
+      <summary>Prompt de imagen <span>${prompt ? `${prompt.length} caracteres` : 'sin prompt'}</span></summary>
+      <p>${esc(prompt || 'Sin prompt para este frame.')}</p>
+      <button type="button" data-action="copy-scene-image-prompt" data-index="${index}" data-kind="${kind}" aria-label="Copiar prompt de imagen">${icon('i-copy')}Copiar prompt</button>
+    </details>
+  </div>`;
+}
+
+function studioMasterHTML(result) {
+  const input = result.input;
+  return `<div class="studio-master">
+    <div class="studio-master-head">
+      <div><p class="eyebrow">Ficha maestra</p><h4>Continuidad visual del proyecto</h4></div>
+      <span class="meta-badge">${icon('i-lock')}9:16</span>
+    </div>
+    <div class="studio-master-grid">
+      <div><span>Personajes</span><p>${esc(input.characters || 'Sin definir')}</p></div>
+      <div><span>Vestuario</span><p>${esc(input.wardrobe || 'Sin definir')}</p></div>
+      <div><span>Escenarios</span><p>${esc(input.locations || 'Sin definir')}</p></div>
+      <div><span>Iluminación</span><p>${esc(input.lighting || 'Sin definir')}</p></div>
+    </div>
+    <div class="studio-master-foot">
+      <p><span>Dirección de arte</span>${esc(input.art)}</p>
+      ${input.referenceImage ? `<div class="studio-reference-thumb"><img src="${input.referenceImage}" alt="Referencia visual del proyecto"><span>Referencia visual</span></div>` : '<span class="studio-reference-none">Sin imagen de referencia</span>'}
+    </div>
+  </div>`;
+}
+
+function studioProgressHTML() {
+  const batch = ui.studioBatch;
+  if (!batch) return '';
+  const percent = batch.total ? Math.round((batch.done / batch.total) * 100) : 0;
+  return `<div class="studio-progress" id="studio-image-progress" role="status">
+    <div class="studio-progress-top"><strong>${batch.running ? 'Generando imágenes' : batch.errors.length ? 'Generación con errores' : 'Imágenes listas'}</strong><span>${batch.done}/${batch.total}</span></div>
+    <div class="studio-progress-bar"><span style="width:${percent}%"></span></div>
+    <div class="studio-progress-foot">
+      <span>${batch.running ? esc(batch.current || 'Preparando la siguiente imagen…') : batch.errors.length ? `${batch.errors.length} imagen(es) necesitan reintento.` : 'Todos los frames se generaron correctamente.'}</span>
+      ${batch.errors.length && !batch.running ? `<button class="btn btn-tiny btn-ghost" type="button" data-action="retry-failed-images">${icon('i-refresh')}Reintentar fallidas</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function storyboardSceneHTML(result, scene) {
+  const index = scene.number - 1;
+  return `<article class="storyboard-card" data-scene="${index}">
     <div class="storyboard-top">
       <span class="scene-number">${scene.number}</span>
       <strong>${esc(scene.title)}</strong>
-      <span>${esc(scene.time)}</span>
+      <span>${esc(scene.time)} · ${esc(scene.duration)} s</span>
     </div>
-    <div class="storyboard-frames">
-      <div class="frame-block">
-        <div class="frame-visual"><span class="frame-label">Inicio</span></div>
-        <strong>Fotograma inicial</strong>
-        <p>${esc(scene.startFrame)}</p>
-      </div>
-      <div class="frame-block end">
-        <div class="frame-visual"><span class="frame-label">Final</span></div>
-        <strong>Fotograma final</strong>
-        <p>${esc(scene.endFrame)}</p>
-      </div>
+    <div class="scene-visual">
+      <span>Descripción visual</span>
+      <p>${esc(scene.visual)}</p>
     </div>
-    <div class="storyboard-details">
+    <div class="studio-frame-grid">${sceneFrameHTML(result, scene, 'start')}${sceneFrameHTML(result, scene, 'end')}</div>
+    <div class="storyboard-details studio-scene-details">
+      <div class="storyboard-detail"><span>Duración individual</span><p><input class="scene-duration-input" type="number" min="2" max="20" step="1" value="${scene.duration}" data-scene-duration="${index}" aria-label="Duración de la escena ${scene.number} en segundos"> s</p></div>
+      <div class="storyboard-detail"><span>Movimiento de cámara</span><p>${esc(scene.camera)}</p></div>
       <div class="storyboard-detail"><span>Acción</span><p>${esc(scene.action)}</p></div>
-      <div class="storyboard-detail"><span>Cámara</span><p>${esc(scene.camera)}</p></div>
-      <div class="storyboard-detail"><span>Encuadre</span><p>${esc(scene.framing)}</p></div>
       <div class="storyboard-detail"><span>Transición</span><p>${esc(scene.transition)}</p></div>
+      <div class="storyboard-detail"><span>Encuadre</span><p>${esc(scene.framing)}</p></div>
     </div>
     <div class="prompt-box">
-      <small>${icon('i-wand')}Prompt de animación</small>
+      <div class="prompt-box-head"><small>${icon('i-wand')}Prompt de animación independiente</small><span>${esc(scene.duration)} s</span></div>
       <p>${esc(scene.animationPrompt)}</p>
-      <button type="button" data-action="copy-scene" data-index="${scene.number - 1}" aria-label="Copiar prompt de la escena ${scene.number}">${icon('i-copy')}</button>
+      <div class="prompt-box-actions">
+        <button type="button" data-action="regenerate-animation-prompt" data-index="${index}" aria-label="Regenerar prompt de animación">${icon('i-refresh')}Regenerar</button>
+        <button type="button" data-action="copy-scene" data-index="${index}" aria-label="Copiar prompt de animación">${icon('i-copy')}Copiar</button>
+      </div>
     </div>
   </article>`;
 }
@@ -404,19 +559,24 @@ function renderStoryboardResult(result, scroll = true) {
   const output = $('#studio-output');
   const title = $('#studio-result-title');
   if (!output) return;
+  recalculateSceneTiming(result);
   output.classList.add('has-result');
+  const total = storyboardTotalDuration(result);
   output.innerHTML = `<div class="result-meta">
     <span class="meta-badge">${platformDot(result.input.platform)}${esc(result.input.platform)}</span>
-    <span class="meta-badge">${icon('i-clock')}${esc(result.input.duration)} s</span>
+    <span class="meta-badge">${icon('i-clock')}${total} s en ${result.scenes.length} escenas</span>
     <span class="meta-badge">${icon('i-image')}${esc(result.input.style)}</span>
-    <span class="meta-badge">${icon('i-layers')}${result.scenes.length} escenas</span>
+    <span class="meta-badge">${icon('i-layers')}9:16</span>
   </div>
+  ${studioProgressHTML()}
+  ${studioMasterHTML(result)}
   <div class="studio-summary">
     <h4>${icon('i-wand')}Prompt maestro de consistencia</h4>
     <p>${esc(result.masterPrompt)}</p>
   </div>
-  <div class="storyboard-list">${result.scenes.map(storyboardSceneHTML).join('')}</div>`;
+  <div class="storyboard-list">${result.scenes.map((scene) => storyboardSceneHTML(result, scene)).join('')}</div>`;
   if (title) title.textContent = compactTitle(result.input.topic, 72);
   setStudioActions(true);
+  if (typeof updateStudioActionState === 'function') updateStudioActionState();
   if (scroll) output.scrollTop = 0;
 }

@@ -220,12 +220,13 @@ function avatarResultMarkup(result) {
   const input = result.input;
   const kit = result.kit || buildAvatarSalesKit(input);
   const format = avatarFormat(input);
-  const providerLabel = result.provider === 'pixelster' ? 'Flux · gratis' : (result.provider === 'pollinations-key' ? 'Clave personal' : 'Respaldo gratis');
-  const providerNote = result.provider === 'pixelster'
-    ? 'Generado con Flux Dev. Sin marca de agua.'
-    : (result.provider === 'pollinations-key'
-      ? 'Generado sin marca de agua con tu clave de Pollinations.'
-      : 'Generado con el respaldo gratuito de Pollinations. Puede incluir marca de agua.');
+  const providerNames = { openai: 'OpenAI', gemini: 'Gemini', pollinations: 'Pollinations', pixelster: 'Flux' };
+  const providerLabel = `${providerNames[result.provider] || 'IA'} · servidor`;
+  const providerNote = result.provider === 'pollinations'
+    ? 'Generado en el servidor con Pollinations público (best-effort).'
+    : result.provider === 'pixelster'
+      ? 'Generado en el servidor con Flux Dev.'
+      : 'Generado en el servidor con el proveedor de imágenes configurado.';
   return `<div class="avatar-result">
     <div class="avatar-stage">
       <div class="avatar-photo ${format.className}">
@@ -288,12 +289,19 @@ function renderAvatarHistory() {
 
 function updateAvatarEngineNote() {
   const note = $('#avatar-engine-note');
+  const badge = $('#avatar-engine-badge');
   if (!note) return;
-  const hasKey = Boolean(state.settings.pollinationsKey);
-  note.classList.toggle('has-key', hasKey);
-  note.innerHTML = hasKey
-    ? `${icon('i-check')}Flux Dev activo. Tu clave de Pollinations queda como respaldo si el motor principal está ocupado.`
-    : `${icon('i-info')}Generación gratuita con Flux Dev en un servicio externo. Si está ocupado, se usará un respaldo automático.`;
+  const status = ui.imageStatus;
+  if (badge) {
+    badge.innerHTML = status?.primary
+      ? `<span class="pulse-dot"></span>Imagen IA · ${esc(status.primary.label)}`
+      : '<span class="pulse-dot"></span>Imagen IA · servidor';
+  }
+  if (status?.primary) {
+    note.innerHTML = `${icon('i-lock')}Motor seguro en el servidor: ${esc(status.primary.label)}. Ninguna clave se guarda en el navegador.`;
+    return;
+  }
+  note.innerHTML = `${icon('i-lock')}La generación ocurre en el servidor. Configura las claves en <code>.env</code>.`;
 }
 
 function renderAvatarFromState() {
@@ -383,7 +391,7 @@ function showAvatarError(error) {
       <button class="btn btn-primary" type="button" data-action="retry-avatar">${icon('i-refresh')}Reintentar</button>
       <button class="btn btn-ghost" type="button" data-action="open-settings">${icon('i-settings')}Abrir ajustes</button>
     </div>
-    <p class="fine-print">${icon('i-info')}Si usas el modo gratuito, espera el tiempo indicado o conecta tu clave de Pollinations.</p>
+    <p class="fine-print">${icon('i-info')}Espera el tiempo indicado o revisa la configuración del servidor de imágenes.</p>
   </div>`;
 }
 
@@ -412,7 +420,7 @@ function startAvatarCooldown(seconds) {
     }
     if (note) {
       note.hidden = false;
-      note.textContent = `Límite gratuito alcanzado. Espera ${remaining} s o conecta tu clave en Ajustes.`;
+      note.textContent = `Límite temporal alcanzado. Espera ${remaining} s o revisa el servidor de imágenes.`;
     }
   };
   tick();
@@ -428,108 +436,57 @@ function loadImageFromSource(source) {
   });
 }
 
-async function normalizeAvatarBlob(blob) {
-  const objectUrl = URL.createObjectURL(blob);
-  try {
-    const image = await loadImageFromSource(objectUrl);
-    const scale = Math.min(1, 640 / image.naturalWidth);
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.round(image.naturalWidth * scale);
-    canvas.height = Math.round(image.naturalHeight * scale);
-    const context = canvas.getContext('2d');
-    context.fillStyle = '#0a0d13';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg', 0.8);
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
+async function normalizeAvatarDataUrl(dataUrl) {
+  const image = await loadImageFromSource(dataUrl);
+  const scale = Math.min(1, 640 / image.naturalWidth);
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(image.naturalWidth * scale);
+  canvas.height = Math.round(image.naturalHeight * scale);
+  const context = canvas.getContext('2d');
+  context.fillStyle = '#0a0d13';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/jpeg', 0.8);
 }
 
-async function requestPixelSterImage(prompt, format) {
+async function requestAvatarImage(prompt, negativePrompt, format) {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 120000);
+  const timeout = window.setTimeout(() => controller.abort(), 180000);
   try {
-    const response = await fetch('https://ahm7xmakki.com/api/tti', {
+    const response = await fetch('/api/images/generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ prompt, ratio: format }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: `${prompt}\nAvoid: ${negativePrompt}`,
+        aspectRatio: format,
+        references: []
+      }),
       signal: controller.signal
     });
-    if (!response.ok) throw new Error(`El motor principal respondió ${response.status}.`);
-    const data = await response.json();
-    if (!data?.success || !data?.imageUrl) throw new Error('El motor principal no devolvió una imagen.');
-    const imageResponse = await fetch(data.imageUrl, { signal: controller.signal, cache: 'no-store' });
-    if (!imageResponse.ok) throw new Error('No se pudo descargar la imagen generada.');
-    const blob = await imageResponse.blob();
-    if (!blob.type.startsWith('image/')) throw new Error('El motor principal devolvió un archivo no válido.');
-    return { image: await normalizeAvatarBlob(blob), provider: 'pixelster' };
-  } catch (error) {
-    if (error.name === 'AbortError') throw new Error('El motor principal tardó demasiado.');
-    throw error;
-  } finally {
-    window.clearTimeout(timeout);
-  }
-}
-
-async function requestPollinationsImage(prompt, negativePrompt, seed) {
-  const key = String(state.settings.pollinationsKey || '').trim();
-  const headers = { Accept: 'image/jpeg,image/*' };
-  let url;
-  let provider;
-  if (key) {
-    provider = 'pollinations-key';
-    url = `https://gen.pollinations.ai/image/${encodeURIComponent(prompt)}?model=flux&width=768&height=1024&seed=${seed}&nologo=true&enhance=false&negative_prompt=${encodeURIComponent(negativePrompt)}`;
-    headers.Authorization = `Bearer ${key}`;
-  } else {
-    provider = 'pollinations-free';
-    url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=1024&seed=${seed}&nologo=true&enhance=true&negative_prompt=${encodeURIComponent(negativePrompt)}`;
-  }
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 120000);
-  try {
-    const response = await fetch(url, { headers, signal: controller.signal, cache: 'no-store' });
-    const contentType = response.headers.get('content-type') || '';
-    if (!response.ok || !contentType.startsWith('image/')) {
-      const raw = await response.text();
-      let message = raw.slice(0, 240);
-      let retryAfter = 0;
-      try {
-        const data = JSON.parse(raw);
-        message = data?.error?.message || data?.message || message;
-      } catch {
-        const retryMatch = raw.match(/Retry after (\d+)s/i);
-        if (retryMatch) retryAfter = Number(retryMatch[1]);
-      }
-      const retryMatch = String(message).match(/Retry after (\d+)s/i);
-      if (retryMatch) retryAfter = Number(retryMatch[1]);
-      if (response.status === 402) retryAfter = retryAfter || 45;
-      const error = new Error(message || 'El proveedor de imagen rechazó la solicitud.');
-      error.retryAfter = retryAfter;
-      throw error;
-    }
-    const blob = await response.blob();
-    if (!blob.type.startsWith('image/')) throw new Error('El proveedor devolvió un archivo que no es una imagen.');
-    return { image: await normalizeAvatarBlob(blob), provider };
-  } catch (error) {
-    if (error.name === 'AbortError') throw new Error('El respaldo tardó demasiado. Inténtalo de nuevo.');
-    throw error;
-  } finally {
-    window.clearTimeout(timeout);
-  }
-}
-
-async function requestAvatarImage(prompt, negativePrompt, seed, format) {
-  try {
-    return await requestPixelSterImage(prompt, format);
-  } catch (primaryError) {
+    let data = null;
     try {
-      return await requestPollinationsImage(prompt, negativePrompt, seed);
-    } catch (fallbackError) {
-      const error = new Error('No se pudo generar el retrato. Los motores de imagen no respondieron o están ocupados. Espera un poco e inténtalo de nuevo.');
-      error.retryAfter = fallbackError.retryAfter || 0;
+      data = await response.json();
+    } catch {}
+    if (!response.ok) {
+      const error = new Error(data?.error || 'El servidor no pudo generar el retrato.');
+      error.code = data?.code || 'http_error';
+      if (response.status === 429 || data?.code === 'rate_limited') error.retryAfter = 45;
       throw error;
     }
+    if (!data?.image || !String(data.image).startsWith('data:image/')) {
+      throw new Error('El servidor no devolvió una imagen válida.');
+    }
+    return {
+      image: await normalizeAvatarDataUrl(data.image),
+      provider: data.provider || 'server',
+      model: data.model || '',
+      fallback: Boolean(data.fallback)
+    };
+  } catch (error) {
+    if (error.name === 'AbortError') throw new Error('La generación tardó demasiado. Inténtalo de nuevo.');
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
   }
 }
 
@@ -539,7 +496,7 @@ async function generateAvatarFromInput(input) {
   const negativePrompt = buildAvatarNegativePrompt();
   showAvatarLoading();
   try {
-    const image = await requestAvatarImage(prompt, negativePrompt, seed, input.format);
+    const image = await requestAvatarImage(prompt, negativePrompt, input.format);
     const result = {
       id: uid('avatar'),
       input,

@@ -62,7 +62,15 @@ const ui = {
   avatarBusy: false,
   avatarCooldownUntil: 0,
   avatarLoadingTimer: null,
-  avatarCooldownTimer: null
+  avatarCooldownTimer: null,
+  studioBusy: false,
+  studioReference: null,
+  studioReferenceName: '',
+  studioImageBusy: new Set(),
+  studioImageErrors: {},
+  studioBatch: null,
+  imageStatus: null,
+  imageStatusError: ''
 };
 
 let state = loadState();
@@ -201,7 +209,7 @@ function defaultState() {
   return {
     version: APP_VERSION,
     profile: { name: 'Creador', country: 'México' },
-    settings: { sampleMode: false, pollinationsKey: '' },
+    settings: { sampleMode: false },
     publications: [],
     metrics: [],
     incomes: [],
@@ -230,11 +238,13 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return base;
     const parsed = JSON.parse(raw);
+    const settings = { ...base.settings, ...(parsed.settings || {}) };
+    delete settings.pollinationsKey;
     return {
       ...base,
       ...parsed,
       profile: { ...base.profile, ...(parsed.profile || {}) },
-      settings: { ...base.settings, ...(parsed.settings || {}) },
+      settings,
       publications: Array.isArray(parsed.publications) ? parsed.publications : [],
       metrics: Array.isArray(parsed.metrics) ? parsed.metrics : [],
       incomes: Array.isArray(parsed.incomes) ? parsed.incomes : [],

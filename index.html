@@ -374,7 +374,7 @@
               <p class="page-sub">Diseña una persona sintética fotorrealista para presentar productos, ganar confianza y probar ángulos de venta sin organizar una sesión de fotos.</p>
             </div>
             <div class="page-actions">
-              <span class="engine-badge"><span class="pulse-dot"></span>Imagen IA · Flux Dev</span>
+              <span class="engine-badge" id="avatar-engine-badge"><span class="pulse-dot"></span>Imagen IA · servidor</span>
             </div>
           </div>
 
@@ -488,7 +488,7 @@
               </label>
 
               <button class="btn btn-primary btn-block btn-generate" id="avatar-submit" type="submit"><svg><use href="#i-sparkles"></use></svg>Generar avatar con IA</button>
-              <p class="fine-print centered" id="avatar-engine-note"><svg><use href="#i-info"></use></svg>Generación gratuita con Flux Dev en un servicio externo. Si está ocupado, se usará un respaldo automático.</p>
+              <p class="fine-print centered" id="avatar-engine-note"><svg><use href="#i-info"></use></svg>La generación ocurre en el servidor. Ninguna clave se guarda en el navegador.</p>
               <p class="fine-print centered" id="avatar-cooldown" hidden></p>
             </form>
 
@@ -537,7 +537,7 @@
               <h2 id="title-estudio">Estudio de videos IA</h2>
               <p class="page-sub">Diseña storyboards, fotogramas iniciales y finales, y prompts de animación coherentes.</p>
             </div>
-            <span class="engine-badge"><span class="pulse-dot"></span>Storyboard local</span>
+            <span class="engine-badge" id="studio-engine-badge"><span class="pulse-dot"></span>Imágenes IA · conectando</span>
           </div>
 
           <div class="studio-layout">
@@ -599,19 +599,58 @@
               <label class="field">
                 <span>Dirección de arte</span>
                 <input id="studio-art" type="text" maxlength="90" value="Fondo oscuro, luz suave, acento verde lima">
-                <small class="field-hint">Ej. paleta, locación, vestuario o energía.</small>
+                <small class="field-hint">Paleta, energía y acabado visual.</small>
               </label>
 
+              <div class="form-divider"><span>Ficha maestra</span><small>Se repite en cada prompt</small></div>
+
+              <label class="field">
+                <span>Personajes</span>
+                <textarea id="studio-characters" rows="2" maxlength="180" placeholder="Ej. Maya, mujer mexicana de 29 años, cabello ondulado, expresión cercana">Maya, mujer mexicana de 29 años, cabello ondulado, expresión cercana</textarea>
+              </label>
+
+              <div class="form-row">
+                <label class="field">
+                  <span>Vestuario</span>
+                  <textarea id="studio-wardrobe" rows="2" maxlength="120">Blusa de lino beige y jeans oscuros</textarea>
+                </label>
+                <label class="field">
+                  <span>Escenarios</span>
+                  <textarea id="studio-locations" rows="2" maxlength="120">Cocina luminosa con plantas y superficies neutras</textarea>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Iluminación</span>
+                <textarea id="studio-lighting" rows="2" maxlength="120">Luz de ventana suave, rebote cálido y sombras controladas</textarea>
+              </label>
+
+              <div class="studio-reference-field">
+                <div class="studio-reference-label"><span>Referencia visual <em>opcional</em></span><small>Se reutiliza cuando el motor admite imágenes de referencia.</small></div>
+                <div class="studio-reference-actions">
+                  <label class="btn btn-small btn-ghost" for="studio-reference"><svg><use href="#i-upload"></use></svg>Subir imagen</label>
+                  <input id="studio-reference" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+                  <button class="btn btn-small btn-ghost" id="studio-reference-clear" type="button" hidden><svg><use href="#i-x"></use></svg>Quitar</button>
+                </div>
+                <div class="studio-reference-preview" id="studio-reference-preview" hidden></div>
+              </div>
+
+              <div class="studio-api-note" id="studio-api-note"><svg><use href="#i-info"></use></svg><span>Comprobando el motor de imágenes del servidor…</span></div>
+
               <button class="btn btn-primary btn-block btn-generate" type="submit"><svg><use href="#i-film"></use></svg>Crear storyboard</button>
-              <p class="fine-print centered"><svg><use href="#i-info"></use></svg>Los prompts son borradores para tu herramienta de video preferida.</p>
+              <p class="fine-print centered"><svg><use href="#i-lock"></use></svg>Las claves de imagen viven en el servidor. El navegador solo recibe los resultados.</p>
             </form>
 
             <div class="panel output-panel studio-output-panel">
               <div class="output-toolbar">
                 <div><p class="eyebrow">Storyboard</p><h3 id="studio-result-title">Tu tablero visual</h3></div>
                 <div class="output-actions" id="studio-actions" hidden>
-                  <button class="btn btn-small btn-ghost" type="button" data-action="copy-storyboard"><svg><use href="#i-copy"></use></svg>Copiar prompt</button>
-                  <button class="btn btn-small btn-dark" type="button" data-action="save-storyboard"><svg><use href="#i-save"></use></svg>Guardar prompts</button>
+                  <button class="btn btn-small btn-primary" type="button" data-action="generate-all-images"><svg><use href="#i-image"></use></svg>Generar imágenes</button>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="generate-animation-prompts"><svg><use href="#i-wand"></use></svg>Prompts</button>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="copy-storyboard"><svg><use href="#i-copy"></use></svg>Copiar todo</button>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="download-storyboard-images"><svg><use href="#i-download"></use></svg>Descargar ZIP</button>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="export-storyboard"><svg><use href="#i-upload"></use></svg>Exportar</button>
+                  <button class="btn btn-small btn-dark" type="button" data-action="save-storyboard"><svg><use href="#i-save"></use></svg>Guardar</button>
                 </div>
               </div>
               <div id="studio-output" class="output-body">
@@ -623,11 +662,11 @@
                     <span class="play-badge"><svg><use href="#i-play"></use></svg></span>
                   </div>
                   <h3>Del concepto al fotograma</h3>
-                  <p>Describe tu idea y obtén escenas con encuadre, acción, transición y prompts de animación.</p>
+                  <p>Describe tu idea y obtén escenas con imágenes iniciales y finales reales, duración propia y prompts de animación.</p>
                   <div class="empty-tips">
-                    <span><svg><use href="#i-check"></use></svg>Inicio y final</span>
+                    <span><svg><use href="#i-check"></use></svg>Imágenes 9:16</span>
                     <span><svg><use href="#i-check"></use></svg>Movimiento de cámara</span>
-                    <span><svg><use href="#i-check"></use></svg>Prompts listos</span>
+                    <span><svg><use href="#i-check"></use></svg>Descarga y ZIP</span>
                   </div>
                 </div>
               </div>
@@ -884,6 +923,7 @@
   <script src="js/data-views.js" defer></script>
   <script src="js/sample.js" defer></script>
   <script src="js/modals.js" defer></script>
+  <script src="js/studio.js" defer></script>
   <script src="js/actions.js" defer></script>
 </body>
 </html>
