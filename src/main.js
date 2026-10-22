@@ -381,6 +381,7 @@ const modalTemplates = {
       <li><span class="help-icon">02</span><div><b>Come y crece</b><small>Recoge corazones y orbes. Los orbes grandes valen más y te hacen más largo.</small></div></li>
       <li><span class="help-icon">03</span><div><b>Turbo</b><small>Mantén pulsado el botón Turbo, toca la mitad derecha o usa Espacio. Gastas longitud mientras aceleras.</small></div></li>
       <li><span class="help-icon">04</span><div><b>Sobrevive</b><small>Si tu cabeza toca el cuerpo de otro gusano, pierdes. Rodea a los rivales y oblígalos a chocar.</small></div></li>
+      <li><span class="help-icon">05</span><div><b>Recoge los restos</b><small>Cuando un gusano muere, su cuerpo deja comida en la arena. Vuelve a por ella para crecer rápido.</small></div></li>
     </ul>
     <div class="modal-actions">
       <button class="btn-ghost" type="button" data-close-modal>Volver</button>

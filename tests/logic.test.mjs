@@ -4,6 +4,7 @@ import {
   ARENA_RADIUS,
   MAX_SEGMENTS,
   angleDelta,
+  corpseDropPlan,
   distanceSq,
   foodValue,
   hitsCircle,
@@ -121,4 +122,10 @@ test("foodValue returns the expected ranges", () => {
   assert.equal(foodValue(true, () => 0), 8);
   assert.equal(foodValue(false, () => 0.999), 5);
   assert.equal(foodValue(true, () => 0.999), 12);
+});
+
+test("corpseDropPlan scales food with the dead worm", () => {
+  assert.deepEqual(corpseDropPlan(27, 34), { count: 5, value: 5 });
+  assert.deepEqual(corpseDropPlan(51, 82), { count: 10, value: 7 });
+  assert.deepEqual(corpseDropPlan(200, 500), { count: 14, value: 10 });
 });

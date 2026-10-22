@@ -124,13 +124,16 @@ function createGroundTexture(theme) {
 }
 
 class FoodField {
-  constructor(scene, theme, count = 410) {
+  constructor(scene, theme, count = 410, reserve = 140) {
     this.scene = scene;
-    this.count = count;
+    this.baseCount = count;
+    this.count = count + reserve;
     this.theme = theme;
     this.items = [];
     this.orbCount = 0;
     this.heartCount = 0;
+    this.inactive = [];
+    this.corpseSlots = new Set();
 
     this.orbMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
@@ -152,8 +155,8 @@ class FoodField {
       side: THREE.DoubleSide,
     });
 
-    this.orbMesh = new THREE.InstancedMesh(SPHERE_GEOMETRY, this.orbMaterial, count);
-    this.heartMesh = new THREE.InstancedMesh(HEART_GEOMETRY, this.heartMaterial, count);
+    this.orbMesh = new THREE.InstancedMesh(SPHERE_GEOMETRY, this.orbMaterial, this.count);
+    this.heartMesh = new THREE.InstancedMesh(HEART_GEOMETRY, this.heartMaterial, this.count);
     this.orbMesh.frustumCulled = false;
     this.heartMesh.frustumCulled = false;
     this.orbMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
@@ -164,10 +167,11 @@ class FoodField {
     this.dummy = new THREE.Object3D();
     this.color = new THREE.Color();
 
-    for (let i = 0; i < count; i += 1) {
+    for (let i = 0; i < this.count; i += 1) {
       const type = Math.random() < 0.52 ? "heart" : "orb";
       const point = randomPointInCircle(ARENA_RADIUS - 6);
       const big = Math.random() < 0.2;
+      const active = i < count;
       const item = {
         x: point.x,
         z: point.z,
@@ -179,8 +183,12 @@ class FoodField {
         spin: 0.3 + Math.random() * 1.1,
         scale: (big ? 1.34 : 1) * (0.86 + Math.random() * 0.28),
         index: type === "heart" ? this.heartCount++ : this.orbCount++,
+        active,
+        reserve: !active,
+        corpse: false,
       };
       this.items.push(item);
+      if (!active) this.inactive.push(i);
       const mesh = type === "heart" ? this.heartMesh : this.orbMesh;
       mesh.setColorAt(item.index, item.color);
     }
@@ -230,9 +238,20 @@ class FoodField {
 
   writeItem(i, time, initial = false) {
     const item = this.items[i];
+    const mesh = item.type === "heart" ? this.heartMesh : this.orbMesh;
+    if (!item.active) {
+      this.dummy.position.set(0, -200, 0);
+      this.dummy.rotation.set(0, 0, 0);
+      this.dummy.scale.setScalar(0);
+      this.dummy.updateMatrix();
+      mesh.setMatrixAt(item.index, this.dummy.matrix);
+      this.glowPositions[i * 3] = 0;
+      this.glowPositions[i * 3 + 1] = -200;
+      this.glowPositions[i * 3 + 2] = 0;
+      return;
+    }
     const bob = Math.sin(time * 1.7 + item.phase) * 0.17;
     const y = 0.9 + bob + (item.big ? 0.12 : 0);
-    const mesh = item.type === "heart" ? this.heartMesh : this.orbMesh;
     this.dummy.position.set(item.x, y, item.z);
     if (item.type === "heart") {
       this.dummy.rotation.set(-0.32, time * item.spin + item.phase, 0);
@@ -256,9 +275,77 @@ class FoodField {
     this.glow.geometry.attributes.position.needsUpdate = true;
   }
 
+  acquireDropSlot(used) {
+    while (this.inactive.length) {
+      const index = this.inactive.pop();
+      if (!used.has(index)) return index;
+    }
+    for (const index of this.corpseSlots) {
+      if (!used.has(index) && this.items[index].active) return index;
+    }
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      const index = Math.floor(Math.random() * this.baseCount);
+      if (!used.has(index)) return index;
+    }
+    return Math.floor(Math.random() * this.count);
+  }
+
+  dropTrail(points, colors, value, big = false) {
+    const used = new Set();
+    const touched = new Set();
+    for (let i = 0; i < points.length; i += 1) {
+      const point = points[i];
+      const index = this.acquireDropSlot(used);
+      used.add(index);
+      const item = this.items[index];
+      item.active = true;
+      item.corpse = true;
+      item.x = point.x + (Math.random() - 0.5) * 0.9;
+      item.z = point.z + (Math.random() - 0.5) * 0.9;
+      item.big = big;
+      item.value = value;
+      item.scale = (big ? 1.28 : 1.04) * (0.9 + Math.random() * 0.18);
+      item.phase = Math.random() * Math.PI * 2;
+      item.spin = 0.5 + Math.random() * 1.4;
+      item.color.set(colors[i % colors.length]);
+      const mesh = item.type === "heart" ? this.heartMesh : this.orbMesh;
+      mesh.setColorAt(item.index, item.color);
+      this.glowColors[index * 3] = item.color.r;
+      this.glowColors[index * 3 + 1] = item.color.g;
+      this.glowColors[index * 3 + 2] = item.color.b;
+      this.corpseSlots.add(index);
+      touched.add(item.type);
+      this.writeItem(index, 0, true);
+    }
+    if (touched.has("heart")) this.heartMesh.instanceMatrix.needsUpdate = true;
+    if (touched.has("orb")) this.orbMesh.instanceMatrix.needsUpdate = true;
+    this.orbMesh.instanceColor.needsUpdate = true;
+    this.heartMesh.instanceColor.needsUpdate = true;
+    this.glow.geometry.attributes.position.needsUpdate = true;
+    this.glow.geometry.attributes.color.needsUpdate = true;
+  }
+
+  consume(i) {
+    const item = this.items[i];
+    item.corpse = false;
+    this.corpseSlots.delete(i);
+    if (item.reserve) {
+      item.active = false;
+      this.inactive.push(i);
+      this.writeItem(i, 0, true);
+      const mesh = item.type === "heart" ? this.heartMesh : this.orbMesh;
+      mesh.instanceMatrix.needsUpdate = true;
+      this.glow.geometry.attributes.position.needsUpdate = true;
+    } else {
+      this.respawn(i);
+    }
+  }
+
   respawn(i) {
     const item = this.items[i];
     const point = randomPointInCircle(ARENA_RADIUS - 6);
+    item.active = true;
+    item.corpse = false;
     item.x = point.x;
     item.z = point.z;
     item.big = Math.random() < 0.2;
@@ -267,6 +354,7 @@ class FoodField {
     item.phase = Math.random() * Math.PI * 2;
     item.spin = 0.3 + Math.random() * 1.1;
     item.color.set(this.theme.food[Math.floor(Math.random() * this.theme.food.length)]);
+    this.corpseSlots.delete(i);
     const mesh = item.type === "heart" ? this.heartMesh : this.orbMesh;
     mesh.setColorAt(item.index, item.color);
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;

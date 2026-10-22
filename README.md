@@ -39,6 +39,7 @@ Una reinterpretación en 3D de la clásica arena de gusanos para **móvil y tabl
 
 - Arena 3D con iluminación, cielo procedural, suelo generado y partículas.
 - 9 rivales con IA que buscan comida, crecen y reaparecen.
+- Los gusanos destruidos dejan sus restos como comida para que puedas seguir creciendo.
 - Dos arenas (**Jardín de Amor** y **Noche Neón**) y 8 skins desbloqueadas.
 - Clasificación en vivo, minimapa, récord personal y preferencias guardadas en `localStorage`.
 - Efectos de sonido sintetizados con Web Audio (sin archivos externos).

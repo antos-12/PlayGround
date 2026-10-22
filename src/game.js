@@ -4,6 +4,7 @@ import {
   HEAD_RADIUS,
   MIN_BOOST_LENGTH,
   TAU,
+  corpseDropPlan,
   distanceSq,
   hitsCircle,
   randomPointInCircle,
@@ -139,8 +140,21 @@ export class Game {
     this.startRun({ name: this.player.name, skin: this.player.skin });
   }
 
+  dropWormFood(worm) {
+    if (!worm?.positions?.length) return;
+    const { count, value } = corpseDropPlan(worm.segmentCount, worm.length);
+    const points = [];
+    for (let i = 0; i < count; i += 1) {
+      const index = Math.min(worm.positions.length - 1, Math.floor(((i + 0.5) * worm.positions.length) / count));
+      const point = worm.positions[index];
+      if (point) points.push(point);
+    }
+    this.world.food.dropTrail(points, [worm.skin.primary, worm.skin.secondary, worm.skin.glow], value, worm.length >= 70);
+  }
+
   killBot(bot) {
     if (!bot.alive) return;
+    this.dropWormFood(bot);
     bot.kill();
     bot.removed = true;
     this.world.sparkles.emit(bot.x, 1.1, bot.z, bot.skin.primary, 18, 4.5);
@@ -162,6 +176,7 @@ export class Game {
     };
     this.world.sparkles.emit(this.player.x, 1.2, this.player.z, this.player.skin.primary, 42, 7);
     this.world.sparkles.emit(this.player.x, 1.2, this.player.z, this.player.skin.secondary, 22, 5);
+    this.dropWormFood(this.player);
     this.player.kill();
     this.player.removed = true;
     this.state = "dead";
@@ -432,6 +447,7 @@ export class Game {
         let bestDistance = 44 * 44;
         for (let i = 0; i < this.world.food.count; i += 1) {
           const item = this.world.food.items[i];
+          if (!item.active) continue;
           const distance = distanceSq(bot.x, bot.z, item.x, item.z);
           if (distance < bestDistance) {
             bestDistance = distance;
@@ -486,14 +502,20 @@ export class Game {
     const items = this.world.food.items;
     for (let i = 0; i < items.length; i += 1) {
       const item = items[i];
+      if (!item.active) continue;
       const range = HEAD_RADIUS + 0.9 + (item.big ? 0.35 : 0);
       if (distanceSq(worm.x, worm.z, item.x, item.z) <= range * range) {
-        worm.eat(item.value);
-        this.world.food.respawn(i);
+        const value = item.value;
+        const big = item.big;
+        const corpse = item.corpse;
+        const color = item.color.clone();
+        worm.eat(value);
+        this.world.food.consume(i);
         if (worm === this.player) {
-          this.audio.eat(item.value);
-          this.world.sparkles.emit(item.x, 1.1, item.z, item.color, item.big ? 9 : 4, 2.6);
-          if (item.big) this.onToast("Orbe gigante · +9");
+          this.audio.eat(value);
+          this.world.sparkles.emit(item.x, 1.1, item.z, color, big ? 9 : 4, 2.6);
+          if (corpse) this.onToast(`Restos de gusano · +${value}`);
+          else if (big) this.onToast(`Orbe gigante · +${value}`);
         }
       }
     }
@@ -704,7 +726,6 @@ export class Game {
       this.checkCollisions();
       this.emitHud();
     } else if (this.state === "menu" || this.state === "dead") {
-      for (const bot of this.bots) if (bot.alive) this.consumeFood(bot);
       this.emitHud();
     }
 

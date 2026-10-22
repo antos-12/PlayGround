@@ -149,3 +149,10 @@ export function softenLengthAfterBoost(length, dt) {
 export function foodValue(big, random = Math.random) {
   return big ? 8 + Math.floor(random() * 5) : 3 + Math.floor(random() * 3);
 }
+
+export function corpseDropPlan(segmentCount, length) {
+  return {
+    count: clamp(Math.round(segmentCount / 5), 4, 14),
+    value: clamp(3 + Math.round(length * 0.05), 4, 10),
+  };
+}
