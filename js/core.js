@@ -62,7 +62,12 @@ const ui = {
   avatarBusy: false,
   avatarCooldownUntil: 0,
   avatarLoadingTimer: null,
-  avatarCooldownTimer: null
+  avatarCooldownTimer: null,
+  studioBusy: false,
+  studioProvider: null,
+  studioProviderLoading: false,
+  studioProgress: { done: 0, total: 0, label: '' },
+  studioJobId: 0
 };
 
 let state = loadState();

@@ -154,6 +154,10 @@ function submitStudio(event) {
     duration: Number($('#studio-duration').value),
     style: $('#studio-style').value,
     format: $('#studio-format').value,
+    cast: $('#studio-cast').value.trim() || 'Personaje principal consistente',
+    wardrobe: $('#studio-wardrobe').value.trim() || 'Vestuario consistente',
+    location: $('#studio-location').value.trim() || 'Escenario consistente',
+    lighting: $('#studio-lighting').value.trim() || 'Iluminación natural consistente',
     art: $('#studio-art').value.trim() || 'Fondo oscuro, luz suave, acento verde lima'
   };
   const result = generateStoryboard(input);
@@ -162,7 +166,7 @@ function submitStudio(event) {
   renderStoryboardResult(result);
   renderAll();
   scrollToOutput('.studio-output-panel');
-  toast('Storyboard creado con prompts de animación.');
+  toast('Storyboard creado con ficha maestra y prompts de animación.');
 }
 
 function generatorBody(result) {
@@ -232,19 +236,28 @@ function copyGenerator() {
 }
 
 function storyboardBody(result) {
+  const total = studioTotalDuration(result);
   return `STORYBOARD · ${result.input.topic}
 Plataforma: ${result.input.platform}
-Duración: ${result.input.duration} s
+Formato: ${result.input.format} · 9:16
+Duración objetivo: ${result.input.duration} s
+Duración total calculada: ${total} s
 Estilo: ${result.input.style}
-Formato: ${result.input.format}
 Dirección de arte: ${result.input.art}
+
+FICHA MAESTRA
+Personaje: ${result.master.cast}
+Vestuario: ${result.master.wardrobe}
+Escenario: ${result.master.location}
+Iluminación: ${result.master.lighting}
 
 PROMPT MAESTRO
 ${result.masterPrompt}
 
-${result.scenes.map((scene) => `ESCENA ${scene.number} · ${scene.title} · ${scene.time}
-Fotograma inicial: ${scene.startFrame}
-Fotograma final: ${scene.endFrame}
+${result.scenes.map((scene) => `ESCENA ${scene.number} · ${scene.title} · ${scene.time} · ${scene.duration} s
+Descripción visual: ${scene.description}
+Prompt imagen inicial: ${scene.startPrompt}
+Prompt imagen final: ${scene.endPrompt}
 Acción: ${scene.action}
 Cámara: ${scene.camera}
 Encuadre: ${scene.framing}
@@ -380,6 +393,40 @@ function handleAction(action, element) {
       break;
     case 'copy-storyboard':
       copyStoryboard();
+      break;
+    case 'copy-master-prompt':
+      if (state.lastStoryboard) copyText(state.lastStoryboard.masterPrompt, 'Prompt maestro copiado.');
+      break;
+    case 'copy-scene-prompt': {
+      const scene = studioSceneById(id);
+      if (!scene) return;
+      const kind = element.dataset.kind;
+      const value = kind === 'animation' ? scene.animationPrompt : kind === 'end' ? scene.endPrompt : scene.startPrompt;
+      if (value) copyText(value, `Prompt ${kind === 'animation' ? 'de animación' : kind === 'end' ? 'final' : 'inicial'} de la escena ${scene.number} copiado.`);
+      break;
+    }
+    case 'generate-studio-images':
+      generateAllStudioImages();
+      break;
+    case 'generate-scene-image':
+    case 'retry-scene-image':
+      generateSceneImage(id, element.dataset.kind || 'start');
+      break;
+    case 'download-scene-image':
+      downloadStudioImage(id, element.dataset.kind || 'start');
+      break;
+    case 'generate-animation-prompts':
+    case 'regenerate-animation-prompts':
+      regenerateAnimationPrompts();
+      break;
+    case 'regenerate-scene-animation':
+      regenerateSceneAnimation(id);
+      break;
+    case 'download-studio-images':
+      downloadAllStudioImages();
+      break;
+    case 'export-studio':
+      exportStudioProject();
       break;
     case 'copy-avatar-kit':
       copyAvatarKit();
@@ -533,6 +580,10 @@ function bindEvents() {
   $('#generator-form').addEventListener('submit', submitGenerator);
   $('#avatar-form').addEventListener('submit', submitAvatar);
   $('#studio-form').addEventListener('submit', submitStudio);
+  document.addEventListener('change', (event) => {
+    const duration = event.target.closest('[data-scene-duration]');
+    if (duration) updateSceneDuration(duration.dataset.sceneDuration, duration.value);
+  });
 
   $('#gen-topic').addEventListener('input', (event) => {
     const count = $('#gen-topic-count');
@@ -631,6 +682,7 @@ function init() {
   const route = routeFromHash();
   if (!location.hash) history.replaceState(null, '', '#inicio');
   showRoute(route, { scroll: false });
+  loadStudioProvider();
   registerServiceWorker();
 }
 

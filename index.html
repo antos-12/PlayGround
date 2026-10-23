@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#07090f">
-  <meta name="description" content="Centro de Control Creator IA: crea avatares influencer, guiones y storyboards; organiza y mide tu contenido para TikTok, Facebook Reels y YouTube Shorts.">
+  <meta name="description" content="Centro de Control Creator IA: crea avatares influencer, storyboards con imágenes reales, guiones y prompts; organiza y mide tu contenido para TikTok, Facebook Reels y YouTube Shorts.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -535,9 +535,9 @@
             <div>
               <p class="eyebrow">Preproducción visual</p>
               <h2 id="title-estudio">Estudio de videos IA</h2>
-              <p class="page-sub">Diseña storyboards, fotogramas iniciales y finales, y prompts de animación coherentes.</p>
+              <p class="page-sub">Convierte una idea en storyboard, imágenes reales 9:16 y prompts de animación con continuidad visual.</p>
             </div>
-            <span class="engine-badge"><span class="pulse-dot"></span>Storyboard local</span>
+            <span class="engine-badge" id="studio-engine-badge"><span class="pulse-dot"></span><span id="studio-engine-label">Comprobando motor de imágenes…</span></span>
           </div>
 
           <div class="studio-layout">
@@ -562,7 +562,7 @@
                   </select>
                 </label>
                 <label class="field">
-                  <span>Duración</span>
+                  <span>Duración objetivo</span>
                   <select id="studio-duration">
                     <option value="15">15 segundos</option>
                     <option value="30" selected>30 segundos</option>
@@ -596,21 +596,47 @@
                 </label>
               </div>
 
-              <label class="field">
-                <span>Dirección de arte</span>
-                <input id="studio-art" type="text" maxlength="90" value="Fondo oscuro, luz suave, acento verde lima">
-                <small class="field-hint">Ej. paleta, locación, vestuario o energía.</small>
-              </label>
+              <div class="master-sheet">
+                <div class="master-sheet-head">
+                  <div><p class="eyebrow">Ficha maestra</p><h4>Continuidad entre escenas</h4></div>
+                  <span>Se repite en cada prompt</span>
+                </div>
+                <div class="form-row">
+                  <label class="field">
+                    <span>Personaje(s)</span>
+                    <input id="studio-cast" type="text" maxlength="120" value="Ana, mujer mexicana de 29 años, cabello oscuro ondulado, rostro natural" required>
+                  </label>
+                  <label class="field">
+                    <span>Vestuario</span>
+                    <input id="studio-wardrobe" type="text" maxlength="100" value="Camiseta negra y blazer oversize verde lima" required>
+                  </label>
+                </div>
+                <div class="form-row">
+                  <label class="field">
+                    <span>Escenario</span>
+                    <input id="studio-location" type="text" maxlength="100" value="Escritorio de creador con plantas y luz suave" required>
+                  </label>
+                  <label class="field">
+                    <span>Iluminación</span>
+                    <input id="studio-lighting" type="text" maxlength="100" value="Luz de ventana difusa, contraste bajo y piel natural" required>
+                  </label>
+                </div>
+                <label class="field">
+                  <span>Paleta y textura</span>
+                  <input id="studio-art" type="text" maxlength="110" value="Fondo oscuro, acento verde lima, grano fino cinematográfico">
+                </label>
+              </div>
 
               <button class="btn btn-primary btn-block btn-generate" type="submit"><svg><use href="#i-film"></use></svg>Crear storyboard</button>
-              <p class="fine-print centered"><svg><use href="#i-info"></use></svg>Los prompts son borradores para tu herramienta de video preferida.</p>
+              <p class="fine-print centered" id="studio-engine-note"><svg><use href="#i-info"></use></svg>Las imágenes se generan en el servidor con un proveedor real. Las claves, si existen, nunca se envían al navegador.</p>
             </form>
 
             <div class="panel output-panel studio-output-panel">
               <div class="output-toolbar">
                 <div><p class="eyebrow">Storyboard</p><h3 id="studio-result-title">Tu tablero visual</h3></div>
                 <div class="output-actions" id="studio-actions" hidden>
-                  <button class="btn btn-small btn-ghost" type="button" data-action="copy-storyboard"><svg><use href="#i-copy"></use></svg>Copiar prompt</button>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="copy-storyboard"><svg><use href="#i-copy"></use></svg>Copiar prompts</button>
+                  <button class="btn btn-small btn-ghost" type="button" data-action="export-studio"><svg><use href="#i-download"></use></svg>Exportar</button>
                   <button class="btn btn-small btn-dark" type="button" data-action="save-storyboard"><svg><use href="#i-save"></use></svg>Guardar prompts</button>
                 </div>
               </div>
@@ -623,11 +649,11 @@
                     <span class="play-badge"><svg><use href="#i-play"></use></svg></span>
                   </div>
                   <h3>Del concepto al fotograma</h3>
-                  <p>Describe tu idea y obtén escenas con encuadre, acción, transición y prompts de animación.</p>
+                  <p>Describe tu idea y obtén escenas con imagen inicial y final, duración propia, movimiento de cámara y prompts independientes.</p>
                   <div class="empty-tips">
-                    <span><svg><use href="#i-check"></use></svg>Inicio y final</span>
-                    <span><svg><use href="#i-check"></use></svg>Movimiento de cámara</span>
-                    <span><svg><use href="#i-check"></use></svg>Prompts listos</span>
+                    <span><svg><use href="#i-check"></use></svg>Imágenes reales</span>
+                    <span><svg><use href="#i-check"></use></svg>Formato 9:16</span>
+                    <span><svg><use href="#i-check"></use></svg>Progreso y reintentos</span>
                   </div>
                 </div>
               </div>
@@ -855,7 +881,7 @@
     <div class="sheet-head"><h3>Más herramientas</h3><button class="icon-button" type="button" data-action="close-more" aria-label="Cerrar"><svg><use href="#i-x"></use></svg></button></div>
     <div class="more-grid">
       <a href="#avatar" data-route="avatar"><span class="more-icon violet"><svg><use href="#i-users"></use></svg></span><strong>Avatar IA</strong><small>Influencer para vender</small></a>
-      <a href="#estudio" data-route="estudio"><span class="more-icon violet"><svg><use href="#i-film"></use></svg></span><strong>Estudio de video</strong><small>Storyboards y prompts</small></a>
+      <a href="#estudio" data-route="estudio"><span class="more-icon violet"><svg><use href="#i-film"></use></svg></span><strong>Estudio de video</strong><small>Storyboard e imágenes IA</small></a>
       <a href="#monetizacion" data-route="monetizacion"><span class="more-icon lime"><svg><use href="#i-wallet"></use></svg></span><strong>Monetización</strong><small>Ingresos por fuente</small></a>
       <a href="#biblioteca" data-route="biblioteca"><span class="more-icon cyan"><svg><use href="#i-library"></use></svg></span><strong>Biblioteca</strong><small>Ideas y guiones</small></a>
       <button type="button" data-action="global-search"><span class="more-icon pink"><svg><use href="#i-search"></use></svg></span><strong>Buscar</strong><small>En todo el estudio</small></button>
@@ -879,6 +905,7 @@
 
   <script src="js/core.js" defer></script>
   <script src="js/generator.js" defer></script>
+  <script src="js/studio.js" defer></script>
   <script src="js/avatar.js" defer></script>
   <script src="js/views.js" defer></script>
   <script src="js/data-views.js" defer></script>

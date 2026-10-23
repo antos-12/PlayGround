@@ -347,6 +347,13 @@ function openSettings() {
       <label class="field"><span>Nombre visible</span><input id="settings-name" type="text" maxlength="40" value="${esc(state.profile.name || '')}" placeholder="Tu nombre o marca"></label>
     </div>
     <div class="settings-group">
+      <h4>Imágenes del estudio</h4>
+      <p class="fine-print" style="margin:0 0 9px">La generación real corre en el servidor de la app. Las claves se leen desde variables de entorno y nunca se envían al navegador.</p>
+      <div class="settings-row"><span>Proveedor activo</span><strong>${esc(studioProviderLabel())}</strong></div>
+      <p class="fine-print" id="settings-studio-status">Comprobando configuración…</p>
+      <p class="fine-print">${icon('i-info')}Para cambiar de proveedor, define IMAGE_PROVIDER y las claves en el entorno del servidor.</p>
+    </div>
+    <div class="settings-group">
       <h4>Generador de avatares IA</h4>
       <p class="fine-print" style="margin:0 0 9px">El motor principal es Flux Dev en modo gratuito. Si está ocupado, la app intenta un respaldo con Pollinations. Puedes añadir tu propia clave de Pollinations para ese respaldo. La clave se guarda solo en este dispositivo.</p>
       <label class="field"><span>Clave de Pollinations <em>opcional</em></span><input id="settings-pollinations-key" type="password" maxlength="160" value="${esc(state.settings.pollinationsKey || '')}" placeholder="sk_… o pk_…" autocomplete="off" spellcheck="false"></label>
@@ -399,6 +406,7 @@ function openSettings() {
     size: 'modal-wide'
   });
   $('#import-file').addEventListener('change', importDataFile);
+  renderStudioProviderStatus();
 }
 
 function saveSettings() {

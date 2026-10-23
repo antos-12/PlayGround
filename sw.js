@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'creator-ia-v8';
+const CACHE_NAME = 'creator-ia-v9';
 const APP_SHELL = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const APP_SHELL = [
   './js/core.js',
   './js/generator.js',
   './js/avatar.js',
+  './js/studio.js',
   './js/views.js',
   './js/data-views.js',
   './js/sample.js',
@@ -35,6 +36,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  if (new URL(event.request.url).pathname.startsWith('/api/')) return;
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
